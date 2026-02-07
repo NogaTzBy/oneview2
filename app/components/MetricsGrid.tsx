@@ -19,12 +19,8 @@ const ICON_MAP: Record<string, string> = {
     windows_24h: '⏰',
 };
 
-// Generar tendencias aleatorias para demo (-15 a +15%)
-const generateTrend = (): number => {
-    return Math.random() * 30 - 15; // Rango -15 a +15
-};
-
 export function MetricsGrid({ metrics, widgets }: MetricsGridProps) {
+    // Reorganized: Now showing ai_purchases in main KPIs, moved conversations_started to secondary
     const mainKPIs = [
         { key: 'conversations_started', label: 'Conversaciones Iniciadas' },
         { key: 'conversations_closed', label: 'Conversaciones Cerradas' },
@@ -35,8 +31,8 @@ export function MetricsGrid({ metrics, widgets }: MetricsGridProps) {
 
     return (
         <div className="space-y-6">
-            {/* Main KPIs */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Main KPIs - Horizontal layout with larger cards */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {mainKPIs.map((kpi) => (
                     <MetricCard
                         key={kpi.key}
@@ -48,12 +44,12 @@ export function MetricsGrid({ metrics, widgets }: MetricsGridProps) {
                         }
                         icon={ICON_MAP[kpi.key] || '📊'}
                         size="large"
-                        trend={generateTrend()}
+                    // No trend for now - will be calculated with real data later
                     />
                 ))}
             </div>
 
-            {/* Secondary Widgets */}
+            {/* Secondary Widgets - Grid layout */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {visibleWidgets
                     .filter((w) => !mainKPIs.some((kpi) => kpi.key === w.widget_key))
@@ -74,7 +70,7 @@ export function MetricsGrid({ metrics, widgets }: MetricsGridProps) {
                                 value={value}
                                 icon={ICON_MAP[widget.widget_key] || '📊'}
                                 size="small"
-                                trend={generateTrend()}
+                            // No trend for now
                             />
                         );
                     })}

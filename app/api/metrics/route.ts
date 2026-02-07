@@ -12,6 +12,8 @@ export async function GET(request: NextRequest) {
         const projectId = searchParams.get('project_id');
         const from = searchParams.get('from');
         const to = searchParams.get('to');
+        const includeTrend = searchParams.get('trend') === 'true';
+        const trendMetric = searchParams.get('metric_key') || 'ai_purchases';
 
         if (!projectId) {
             return NextResponse.json(
@@ -51,6 +53,7 @@ export async function GET(request: NextRequest) {
         const metrics = {
             conversations_started: 0,
             conversations_closed: 0,
+            closure_rate: 0,
             human_escalations: 0,
             complaints: 0,
             ai_purchases: 0,
@@ -59,16 +62,20 @@ export async function GET(request: NextRequest) {
             tracking_codes: 0,
             template_opens: 0,
             windows_24h: 0,
-            closure_rate: 0,
         };
+
+        const conversationSet = new Set<string>();
+        const closedConversations = new Set<string>();
 
         events.forEach((event) => {
             switch (event.event_type) {
                 case 'conversation_started':
                     metrics.conversations_started++;
+                    conversationSet.add(event.conversation_id);
                     break;
                 case 'conversation_closed':
                     metrics.conversations_closed++;
+                    closedConversations.add(event.conversation_id);
                     break;
                 case 'human_escalation':
                     metrics.human_escalations++;
@@ -98,23 +105,66 @@ export async function GET(request: NextRequest) {
         });
 
         // Calculate closure rate
-        if (metrics.conversations_started > 0) {
+        if (conversationSet.size > 0) {
             metrics.closure_rate = Math.round(
-                (metrics.conversations_closed / metrics.conversations_started) * 100
+                (closedConversations.size / conversationSet.size) * 100
             );
+        }
+
+        // Generate trend data if requested
+        let trend: Array<{ date: string; value: number }> | undefined;
+        if (includeTrend && from && to) {
+            trend = generateTrendData(events, trendMetric, from, to);
         }
 
         return NextResponse.json({
             metrics,
-            total_events: events.length,
-            date_range: { from, to },
+            trend,
+            period: { from, to },
         });
-
     } catch (error) {
-        console.error('Metrics error:', error);
+        console.error('Unexpected error:', error);
         return NextResponse.json(
             { error: 'Internal server error' },
             { status: 500 }
         );
     }
+}
+
+function generateTrendData(
+    events: any[],
+    metricKey: string,
+    from: string,
+    to: string
+): Array<{ date: string; value: number }> {
+    const fromDate = new Date(from);
+    const toDate = new Date(to);
+    const daysDiff = Math.ceil((toDate.getTime() - fromDate.getTime()) / (1000 * 60 * 60 * 24)) || 1;
+
+    // Create a map of date -> count
+    const dateCounts: Record<string, number> = {};
+
+    // Initialize all dates with 0
+    for (let i = 0; i <= daysDiff; i++) {
+        const date = new Date(fromDate);
+        date.setDate(date.getDate() + i);
+        const dateStr = date.toISOString().split('T')[0];
+        dateCounts[dateStr] = 0;
+    }
+
+    // Count events by date
+    events.forEach((event) => {
+        const eventDate = event.created_at.split('T')[0];
+        if (dateCounts[eventDate] !== undefined && event.event_type === metricKey) {
+            dateCounts[eventDate]++;
+        }
+    });
+
+    // Convert to array format
+    return Object.entries(dateCounts)
+        .sort(([a], [b]) => a.localeCompare(b))
+        .map(([date, value]) => ({
+            date: new Date(date).toLocaleDateString('es-ES', { weekday: 'short' }),
+            value,
+        }));
 }

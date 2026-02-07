@@ -17,6 +17,7 @@ export default function DashboardPage() {
         label: 'Hoy',
     });
     const [metrics, setMetrics] = useState<MetricsResponse['metrics'] | null>(null);
+    const [trendData, setTrendData] = useState<Array<{ date: string; value: number }>>([]);
     const [widgets, setWidgets] = useState<Widget[]>([]);
     const [project, setProject] = useState<Project | null>(null);
     const [loading, setLoading] = useState(true);
@@ -26,10 +27,11 @@ export default function DashboardPage() {
         try {
             setLoading(true);
             const response = await fetch(
-                `/api/metrics?project_id=${PROJECT_ID}&from=${dateRange.from}&to=${dateRange.to}`
+                `/api/metrics?project_id=${PROJECT_ID}&from=${dateRange.from}&to=${dateRange.to}&trend=true&metric_key=ai_purchase`
             );
-            const data: MetricsResponse = await response.json();
+            const data = await response.json();
             setMetrics(data.metrics);
+            setTrendData(data.trend || []);
         } catch (error) {
             console.error('Error fetching metrics:', error);
         } finally {
@@ -57,15 +59,6 @@ export default function DashboardPage() {
             fetchMetrics();
         }
     }, [dateRange]);
-
-    // Generar datos de tendencia de ejemplo (últimos 7 días)
-    const generateTrendData = () => {
-        const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-        return days.map((day, index) => ({
-            date: day,
-            value: Math.floor(Math.random() * 50) + 10 + ((metrics?.conversations_started || 0) * (index / 7))
-        }));
-    };
 
     return (
         <div className="min-h-screen bg-[#0D1117]">
@@ -116,11 +109,13 @@ export default function DashboardPage() {
                     <>
                         <MetricsGrid metrics={metrics} widgets={widgets} />
 
-                        {/* Trend Chart */}
-                        <TrendChart
-                            data={generateTrendData()}
-                            title="Conversaciones Iniciadas - Tendencia"
-                        />
+                        {/* Trend Chart - Now showing AI Purchases */}
+                        {trendData.length > 0 && (
+                            <TrendChart
+                                data={trendData}
+                                title="Compras por IA - Tendencia"
+                            />
+                        )}
                     </>
                 ) : (
                     <div className="metric-card text-center py-16">
