@@ -12,13 +12,13 @@ export function MetricCard({ title, value, icon, size = 'small', trend }: Metric
     const hasChange = trend !== undefined && trend !== 0;
 
     return (
-        <div className={`metric-card ${size === 'large' ? 'col-span-2' : ''}`}>
+        <div className="metric-card">
             <div className="flex items-start justify-between mb-3">
                 <span className="text-3xl opacity-80">{icon}</span>
                 {hasChange && (
                     <div className={`flex items-center gap-1 text-sm font-medium px-2 py-1 rounded-md ${isPositive ? 'bg-[#3FB950]/10 text-[#3FB950]' :
-                            isNegative ? 'bg-[#F85149]/10 text-[#F85149]' :
-                                'bg-[#8B949E]/10 text-[#8B949E]'
+                        isNegative ? 'bg-[#F85149]/10 text-[#F85149]' :
+                            'bg-[#8B949E]/10 text-[#8B949E]'
                         }`}>
                         <span>{isPositive ? '↗' : isNegative ? '↘' : '→'}</span>
                         <span>{Math.abs(trend).toFixed(1)}%</span>
