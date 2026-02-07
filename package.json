@@ -2,7 +2,7 @@
   "name": "oneview",
   "version": "1.0.0",
   "private": true,
-  "description": "Dashboard de análisis para tiendas Shopify",
+  "description": "Dashboard de métricas de agente IA",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -11,14 +11,10 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@prisma/client": "^7.2.0",
-    "@shopify/shopify-api": "^12.2.0",
-    "@shopify/shopify-app-session-storage-prisma": "^8.0.0",
     "@supabase/supabase-js": "^2.39.0",
     "clsx": "^2.1.0",
     "date-fns": "^3.3.1",
     "next": "^14.2.0",
-    "prisma": "^7.2.0",
     "react": "^18.3.0",
     "react-dom": "^18.3.0",
     "recharts": "^3.7.0",
@@ -26,7 +22,6 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
-    "@netlify/plugin-nextjs": "^5.15.8",
     "@types/node": "^20.11.0",
     "@types/react": "^18.2.48",
     "@types/react-dom": "^18.2.18",
