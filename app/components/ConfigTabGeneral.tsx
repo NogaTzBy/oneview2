@@ -121,7 +121,7 @@ export function ConfigTabGeneral({ project, onRefresh }: ConfigTabGeneralProps) 
                     ))}
                 </select>
                 <p className="text-xs text-[#8B949E] mt-2">
-                    La zona horaria afecta el cálculo de "Hoy" y "Este mes".
+                    La zona horaria afecta el cálculo de &quot;Hoy&quot; y &quot;Este mes&quot;.
                 </p>
             </div>
 
