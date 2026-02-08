@@ -10,9 +10,11 @@ import { useProject } from '../context/ProjectContext';
 import { createClient } from '../lib/supabase-client';
 import { ProjectSelector } from '../components/ProjectSelector';
 import { DateRangePicker } from '../components/DateRangePicker';
+import { useNotifications } from '../hooks/useNotifications';
 
 export default function DashboardPage() {
     const { selectedProject } = useProject();
+    const { unreadCount } = useNotifications();
     const [metrics, setMetrics] = useState<Record<string, number> | null>(null);
     const [trendData, setTrendData] = useState<any[]>([]);
     const [widgets, setWidgets] = useState<Widget[]>([]);
@@ -116,8 +118,21 @@ export default function DashboardPage() {
                     </div>
 
                     <div className="flex items-center gap-2">
-                        <button className="p-2 rounded-full hover:bg-slate-100 text-slate-500 transition-colors">
+                        <button className="relative p-2 rounded-full hover:bg-slate-100 text-slate-500 transition-colors">
                             <span className="material-symbols-outlined">notifications</span>
+                            {unreadCount > 0 && (
+                                <div className="absolute top-1 right-1 flex items-center justify-center">
+                                    {unreadCount === 1 ? (
+                                        <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                                    ) : (
+                                        <div className="min-w-[18px] h-[18px] bg-red-500 rounded-full flex items-center justify-center">
+                                            <span className="text-[10px] font-bold text-white px-1">
+                                                {unreadCount > 9 ? '9+' : unreadCount}
+                                            </span>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
                         </button>
                         <button
                             onClick={() => setConfigOpen(true)}
