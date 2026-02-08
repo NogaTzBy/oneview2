@@ -6,18 +6,7 @@ interface MetricsGridProps {
     widgets: Widget[];
 }
 
-const ICON_MAP: Record<string, string> = {
-    conversations_started: '💬',
-    conversations_closed: '✅',
-    closure_rate: '📊',
-    human_escalations: '👤',
-    complaints: '⚠️',
-    ai_purchases: '🛒',
-    payment_messages: '💳',
-    tracking_codes: '📦',
-    template_opens: '📨',
-    windows_24h: '⏰',
-};
+
 
 export function MetricsGrid({ metrics, widgets }: MetricsGridProps) {
     // Reorganized: Now showing ai_purchases in main KPIs, moved conversations_started to secondary
@@ -42,7 +31,6 @@ export function MetricsGrid({ metrics, widgets }: MetricsGridProps) {
                                 ? `${metrics[kpi.key] || 0}%`
                                 : metrics[kpi.key] || 0
                         }
-                        icon={ICON_MAP[kpi.key] || '📊'}
                         size="large"
                     // No trend for now - will be calculated with real data later
                     />
@@ -68,7 +56,6 @@ export function MetricsGrid({ metrics, widgets }: MetricsGridProps) {
                                 key={widget.id}
                                 title={widget.label}
                                 value={value}
-                                icon={ICON_MAP[widget.widget_key] || '📊'}
                                 size="small"
                             // No trend for now
                             />
