@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import { ConfigTabGeneral } from './ConfigTabGeneral';
 import { ConfigTabIngesta } from './ConfigTabIngesta';
 import { ConfigTabWebhook } from './ConfigTabWebhook';
-import { ConfigTabBackups } from './ConfigTabBackups';
 import { Project } from '../lib/types';
 
 interface ConfigModalProps {
@@ -14,7 +13,7 @@ interface ConfigModalProps {
     onRefresh: () => void;
 }
 
-type TabKey = 'general' | 'ingesta' | 'webhook' | 'backups';
+type TabKey = 'general' | 'ingesta' | 'webhook';
 
 export function ConfigModal({ isOpen, onClose, project, onRefresh }: ConfigModalProps) {
     const [activeTab, setActiveTab] = useState<TabKey>('general');
@@ -25,7 +24,6 @@ export function ConfigModal({ isOpen, onClose, project, onRefresh }: ConfigModal
         { key: 'general', label: 'General', icon: 'tune' },
         { key: 'ingesta', label: 'Ingesta', icon: 'cloud_upload' },
         { key: 'webhook', label: 'Webhook', icon: 'webhook' },
-        { key: 'backups', label: 'Respaldos', icon: 'backup' },
     ];
 
     return (
@@ -78,9 +76,6 @@ export function ConfigModal({ isOpen, onClose, project, onRefresh }: ConfigModal
                     )}
                     {activeTab === 'webhook' && (
                         <ConfigTabWebhook project={project} onRefresh={onRefresh} />
-                    )}
-                    {activeTab === 'backups' && (
-                        <ConfigTabBackups project={project} onRefresh={onRefresh} />
                     )}
                 </div>
             </div>

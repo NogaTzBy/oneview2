@@ -81,6 +81,43 @@ export default function DashboardPage() {
         }
     };
 
+    const exportToCSV = () => {
+        if (!metrics) return;
+
+        // Preparar datos para CSV
+        const csvRows = [
+            ['Métrica', 'Valor', 'Fecha de Exportación'],
+            ['Conversaciones Iniciadas', metrics.conversations_started?.toString() || '0', new Date().toLocaleDateString()],
+            ['Conversaciones Cerradas', metrics.conversations_closed?.toString() || '0', new Date().toLocaleDateString()],
+            ['Tasa de Cierre', `${metrics.closure_rate?.toFixed(1) || '0'}%`, new Date().toLocaleDateString()],
+            ['Derivaciones a Humano', metrics.human_escalations?.toString() || '0', new Date().toLocaleDateString()],
+            ['Reclamos Abiertos', metrics.complaints?.toString() || '0', new Date().toLocaleDateString()],
+            ['Compras por IA', metrics.ai_purchases?.toString() || '0', new Date().toLocaleDateString()],
+            ['Aperturas de Plantilla', metrics.template_opens?.toString() || '0', new Date().toLocaleDateString()],
+            ['Respuesta Ventana 24h', metrics.windows_24h?.toString() || '0', new Date().toLocaleDateString()],
+            ['Email - Carritos Abandonados', metrics.email_cart_abandoned?.toString() || '0', new Date().toLocaleDateString()],
+            ['Email - Compradores x1', metrics.email_buyer_x1?.toString() || '0', new Date().toLocaleDateString()],
+            ['Email - Compradores Recurrentes', metrics.email_buyer_recurring?.toString() || '0', new Date().toLocaleDateString()],
+        ];
+
+        // Convertir a CSV string
+        const csvContent = csvRows
+            .map(row => row.map(cell => `"${cell}"`).join(','))
+            .join('\n');
+
+        // Crear blob y descargar
+        const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+
+        link.setAttribute('href', url);
+        link.setAttribute('download', `metricas-${dateRange.from}-${dateRange.to}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
     useEffect(() => {
         if (selectedProject) {
             setProject(selectedProject);
@@ -169,7 +206,21 @@ export default function DashboardPage() {
                         <p className="text-slate-500 mt-1">Sigue tus métricas de comercio impulsadas por IA en tiempo real.</p>
                     </div>
                     <div className="flex gap-3">
-                        <button className="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium shadow-sm hover:shadow-md transition-all flex items-center gap-2 text-slate-900">
+                        <button
+                            onClick={fetchMetrics}
+                            disabled={loading}
+                            className="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium shadow-sm hover:shadow-md transition-all flex items-center gap-2 text-slate-900 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            <span className={`material-symbols-outlined text-[18px] ${loading ? 'animate-spin' : ''}`}>
+                                refresh
+                            </span>
+                            Actualizar
+                        </button>
+                        <button
+                            onClick={exportToCSV}
+                            disabled={!metrics || loading}
+                            className="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium shadow-sm hover:shadow-md transition-all flex items-center gap-2 text-slate-900 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
                             <span className="material-symbols-outlined text-[18px]">download</span>
                             Exportar
                         </button>
