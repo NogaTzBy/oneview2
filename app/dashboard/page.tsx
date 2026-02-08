@@ -57,7 +57,7 @@ export default function DashboardPage() {
         setLoading(true);
         try {
             const response = await fetch(
-                `/api/metrics?projectId=${selectedProject.id}&start=${dateRange.from}&end=${dateRange.to}`
+                `/api/metrics?projectId=${selectedProject.id}&start=${dateRange.from}&end=${dateRange.to}&trend=true`
             );
 
             if (response.ok) {
