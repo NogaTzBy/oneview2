@@ -8,6 +8,8 @@ import { ConfigModal } from '../components/ConfigModal';
 import { DateRange, MetricsResponse, Widget, Project } from '../lib/types';
 import { useProject } from '../context/ProjectContext';
 import { createClient } from '../lib/supabase-client';
+import { ProjectSelector } from '../components/ProjectSelector';
+import { DateRangePicker } from '../components/DateRangePicker';
 
 export default function DashboardPage() {
     const { selectedProject } = useProject();
@@ -105,24 +107,15 @@ export default function DashboardPage() {
                         </div>
 
                         <div className="hidden md:flex items-center gap-4 pl-4 border-l border-slate-200">
-                            <button className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-slate-100 transition-colors text-sm font-medium text-slate-900">
-                                <span className="material-symbols-outlined text-[20px] text-primary">storefront</span>
-                                {selectedProject?.name || 'Seleccionar Tienda'}
-                                <span className="material-symbols-outlined text-[16px] text-slate-400">expand_more</span>
-                            </button>
-
-                            <button className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-slate-100 transition-colors text-sm font-medium text-slate-900">
-                                <span className="material-symbols-outlined text-[20px] text-primary">calendar_today</span>
-                                {dateRange.label}
-                                <span className="material-symbols-outlined text-[16px] text-slate-400">expand_more</span>
-                            </button>
+                            <ProjectSelector />
+                            <DateRangePicker
+                                value={dateRange}
+                                onChange={setDateRange}
+                            />
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-4">
-                        <button className="p-2 rounded-full hover:bg-slate-100 text-slate-500 transition-colors">
-                            <span className="material-symbols-outlined">search</span>
-                        </button>
+                    <div className="flex items-center gap-2">
                         <button className="p-2 rounded-full hover:bg-slate-100 text-slate-500 transition-colors">
                             <span className="material-symbols-outlined">notifications</span>
                         </button>
@@ -132,9 +125,6 @@ export default function DashboardPage() {
                         >
                             <span className="material-symbols-outlined">settings</span>
                         </button>
-                        <div className="w-8 h-8 rounded-full bg-slate-200 overflow-hidden ml-2 border border-slate-200">
-                            <div className="w-full h-full bg-gradient-to-br from-primary to-primary-dark"></div>
-                        </div>
                     </div>
                 </div>
             </header>
