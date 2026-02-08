@@ -18,6 +18,10 @@ const VALID_EVENT_TYPES = [
     'tracking_code_sent',
     'template_open',
     'window_24h_opened',
+    // Email marketing events
+    'email_cart_abandoned',
+    'email_buyer_x1',
+    'email_buyer_recurring',
 ];
 
 export async function POST(request: NextRequest) {
