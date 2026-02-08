@@ -41,6 +41,9 @@ export interface MetricsResponse {
         closure_rate: number;
         template_opens: number;
         windows_24h: number;
+        email_cart_abandoned?: number;
+        email_buyer_x1?: number;
+        email_buyer_recurring?: number;
     };
     trends?: Record<string, number>;
     trend?: Array<{
@@ -53,3 +56,4 @@ export interface MetricsResponse {
         to: string | null;
     };
 }
+

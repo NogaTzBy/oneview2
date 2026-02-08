@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { MetricsGrid } from '../components/MetricsGrid';
+import { EmailMetricsGrid } from '../components/EmailMetricsGrid';
 import { TrendChart } from '../components/TrendChart';
 import { ConfigModal } from '../components/ConfigModal';
 import { DateRange, MetricsResponse, Widget, Project } from '../lib/types';
@@ -194,7 +195,17 @@ export default function DashboardPage() {
                                 title="Tendencia de Compras por IA"
                             />
                         )}
+
+                        {/* Email Marketing Metrics */}
+                        {metrics && (
+                            <EmailMetricsGrid metrics={{
+                                email_cart_abandoned: metrics.summary.email_cart_abandoned,
+                                email_buyer_x1: metrics.summary.email_buyer_x1,
+                                email_buyer_recurring: metrics.summary.email_buyer_recurring
+                            }} />
+                        )}
                     </>
+
                 ) : (
                     <div className="glass-panel bg-white/70 text-center py-16 rounded-2xl">
                         <svg className="w-16 h-16 mx-auto mb-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">

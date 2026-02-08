@@ -62,6 +62,9 @@ export async function GET(request: NextRequest) {
             tracking_codes: 0,
             template_opens: 0,
             windows_24h: 0,
+            email_cart_abandoned: 0,
+            email_buyer_x1: 0,
+            email_buyer_recurring: 0,
         };
 
         const conversationSet = new Set<string>();
@@ -100,6 +103,15 @@ export async function GET(request: NextRequest) {
                     break;
                 case 'window_24h_opened':
                     metrics.windows_24h++;
+                    break;
+                case 'email_cart_abandoned':
+                    metrics.email_cart_abandoned++;
+                    break;
+                case 'email_buyer_x1':
+                    metrics.email_buyer_x1++;
+                    break;
+                case 'email_buyer_recurring':
+                    metrics.email_buyer_recurring++;
                     break;
             }
         });

@@ -19,6 +19,9 @@ const EVENT_TYPES = [
     { key: 'tracking_code_sent', label: 'Código de Rastreo Enviado', icon: 'local_shipping' },
     { key: 'template_opened', label: 'Apertura con Plantilla', icon: 'mail' },
     { key: 'window_24h_opened', label: 'Ventana 24h Abierta', icon: 'schedule' },
+    { key: 'email_cart_abandoned', label: 'Email a Carrito Abandonado', icon: 'shopping_cart' },
+    { key: 'email_buyer_x1', label: 'Email a Comprador x1', icon: 'person' },
+    { key: 'email_buyer_recurring', label: 'Email a Comprador Recurrente', icon: 'repeat' },
 ];
 
 export function ConfigTabIngesta({ project, onRefresh }: ConfigTabIngestaProps) {
@@ -107,6 +110,26 @@ export function ConfigTabIngesta({ project, onRefresh }: ConfigTabIngestaProps) 
                 project_id: project.id,
                 conversation_id: 'conv_12345',
                 channel: 'whatsapp',
+                created_at: new Date().toISOString()
+            },
+            'email_cart_abandoned': {
+                event_type: 'email_cart_abandoned',
+                project_id: project.id,
+                user_email: 'cliente@example.com',
+                cart_value: 25000,
+                created_at: new Date().toISOString()
+            },
+            'email_buyer_x1': {
+                event_type: 'email_buyer_x1',
+                project_id: project.id,
+                user_email: 'comprador@example.com',
+                created_at: new Date().toISOString()
+            },
+            'email_buyer_recurring': {
+                event_type: 'email_buyer_recurring',
+                project_id: project.id,
+                user_email: 'clienterecurrente@example.com',
+                purchase_count: 5,
                 created_at: new Date().toISOString()
             }
         };
@@ -211,8 +234,8 @@ export function ConfigTabIngesta({ project, onRefresh }: ConfigTabIngestaProps) 
                                     key={event.key}
                                     onClick={() => setSelectedEvent(event)}
                                     className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${selectedEvent.key === event.key
-                                            ? 'bg-primary text-white'
-                                            : 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-200'
+                                        ? 'bg-primary text-white'
+                                        : 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-200'
                                         }`}
                                 >
                                     <span className="material-symbols-outlined text-[18px]">
