@@ -137,7 +137,7 @@ export function ConfigTabIngesta({ project, onRefresh }: ConfigTabIngestaProps) 
         const payload = examples[eventType] || examples['conversation_started'];
 
         return `curl -X POST https://api.oneview.io/v1/events \\
-  -H "Authorization: Bearer ${token}" \\
+  -H "X-INGEST-TOKEN: ${token}" \\
   -H "Content-Type: application/json" \\
   -d '${JSON.stringify(payload, null, 2)}'`;
     };
