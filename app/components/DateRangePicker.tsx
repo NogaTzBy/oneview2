@@ -44,77 +44,81 @@ export function DateRangePicker({ value, onChange }: DateRangePickerProps) {
 
     return (
         <div className="relative">
+            <span className="material-symbols-outlined text-[20px] text-primary absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none z-10">
+                calendar_today
+            </span>
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="flex items-center gap-2 px-4 py-2 bg-[#161B22] border border-[#30363D] rounded-lg hover:border-[#7C3AED] transition-colors text-white"
+                className="pl-10 pr-8 py-1.5 bg-transparent border-0 rounded-lg text-slate-900 font-medium text-sm focus:outline-none focus:bg-slate-100 transition-colors cursor-pointer hover:bg-slate-100 flex items-center gap-2"
             >
-                <span className="text-xl">📅</span>
-                <span className="font-medium">{value.label}</span>
-                <span className="text-[#8B949E]">▼</span>
+                {value.label}
             </button>
+            <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none">
+                <span className="material-symbols-outlined text-[16px] text-slate-400">expand_more</span>
+            </div>
 
             {isOpen && (
-                <div className="absolute top-full left-0 mt-2 w-80 bg-[#161B22] rounded-xl shadow-2xl border border-[#30363D] z-50 overflow-hidden">
-                    <div className="p-2">
-                        <div className="text-sm font-semibold text-white px-3 py-2 mb-1">
-                            Ciclo actual
-                        </div>
+                <>
+                    <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
+                    <div className="absolute top-full right-0 mt-2 w-64 glass-panel bg-white rounded-lg shadow-lg z-50 p-4">
+                        <div className="space-y-2">
+                            {presets.map((preset) => (
+                                <button
+                                    key={preset.label}
+                                    onClick={() => {
+                                        onChange(preset);
+                                        setIsOpen(false);
+                                    }}
+                                    className="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-100 text-sm text-slate-900 transition-colors"
+                                >
+                                    {preset.label}
+                                </button>
+                            ))}
 
-                        {/* Presets */}
-                        {presets.map((preset) => (
-                            <button
-                                key={preset.label}
-                                onClick={() => {
-                                    onChange(preset);
-                                    setIsOpen(false);
-                                }}
-                                className={`w-full text-left px-3 py-2 rounded-lg transition-colors ${value.label === preset.label
-                                        ? 'bg-[#7C3AED] text-white'
-                                        : 'text-[#8B949E] hover:bg-[#1A1F2B] hover:text-white'
-                                    }`}
-                            >
-                                {preset.label}
-                            </button>
-                        ))}
 
-                        {/* Custom Range */}
-                        <div className="mt-4 p-3 bg-[#1A1F2B] rounded-lg">
-                            <div className="text-sm font-semibold text-white mb-3">
-                                Rango personalizado
-                            </div>
-
-                            <div className="space-y-3">
-                                <div>
-                                    <label className="block text-xs text-[#8B949E] mb-1">Desde</label>
-                                    <input
-                                        type="date"
-                                        value={customFrom}
-                                        onChange={(e) => setCustomFrom(e.target.value)}
-                                        className="w-full px-3 py-2 bg-[#0D1117] border border-[#30363D] rounded-lg text-white focus:border-[#7C3AED] focus:outline-none"
-                                    />
+                            {/* Custom Range */}
+                            <div className="mt-4 p-3 bg-slate-100 rounded-lg">
+                                <div className="text-sm font-semibold text-slate-900 mb-3">
+                                    Rango personalizado
                                 </div>
 
-                                <div>
-                                    <label className="block text-xs text-[#8B949E] mb-1">Hasta</label>
-                                    <input
-                                        type="date"
-                                        value={customTo}
-                                        onChange={(e) => setCustomTo(e.target.value)}
-                                        className="w-full px-3 py-2 bg-[#0D1117] border border-[#30363D] rounded-lg text-white focus:border-[#7C3AED] focus:outline-none"
-                                    />
+                                <div className="space-y-3">
+                                    <div>
+                                        <label className="text-xs font-medium text-slate-600 block mb-1">
+                                            Desde
+                                        </label>
+                                        <input
+                                            type="date"
+                                            value={customFrom}
+                                            onChange={(e) => setCustomFrom(e.target.value)}
+                                            className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-slate-900 focus:border-primary focus:outline-none"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="text-xs font-medium text-slate-600 block mb-1">
+                                            Hasta
+                                        </label>
+                                        <input
+                                            type="date"
+                                            value={customTo}
+                                            onChange={(e) => setCustomTo(e.target.value)}
+                                            className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-slate-900 focus:border-primary focus:outline-none"
+                                        />
+                                    </div>
                                 </div>
 
                                 <button
                                     onClick={handleApplyCustom}
                                     disabled={!customFrom || !customTo}
-                                    className="w-full px-3 py-2 bg-[#7C3AED] hover:bg-[#8B5CF6] disabled:bg-[#30363D] disabled:text-[#8B949E] text-white font-medium rounded-lg transition-colors"
+                                    className="w-full mt-3 px-3 py-2 bg-primary hover:bg-primary-dark disabled:bg-slate-300 disabled:text-slate-500 text-white font-medium rounded-lg transition-colors"
                                 >
                                     Aplicar
                                 </button>
                             </div>
                         </div>
                     </div>
-                </div>
+                </>
             )}
         </div>
     );

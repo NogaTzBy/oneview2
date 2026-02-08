@@ -24,34 +24,25 @@ export function ProjectSelector() {
     return (
         <>
             <div className="relative">
+                <span className="material-symbols-outlined text-[20px] text-primary absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none z-10">
+                    storefront
+                </span>
                 <select
                     value={selectedProject?.id || ''}
                     onChange={handleProjectChange}
-                    className="appearance-none pl-4 pr-10 py-2.5 bg-gradient-to-b from-[#1C2128] to-[#161B22] border border-[#30363D] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#7C3AED] focus:border-transparent transition-all duration-200 cursor-pointer hover:border-[#7C3AED]/50 shadow-sm"
+                    className="appearance-none pl-10 pr-8 py-1.5 bg-transparent border-0 rounded-lg text-slate-900 font-medium text-sm focus:outline-none focus:bg-slate-100 transition-colors cursor-pointer hover:bg-slate-100"
                 >
                     {projects.map((project) => (
-                        <option key={project.id} value={project.id} className="bg-[#161B22]">
+                        <option key={project.id} value={project.id} className="bg-white">
                             {project.name}
                         </option>
                     ))}
-                    <option value="new" className="bg-[#161B22]">+ Nuevo Proyecto</option>
+                    <option value="new" className="bg-white">+ Nuevo Proyecto</option>
                 </select>
 
-                {/* Custom Chevron Icon */}
-                <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
-                    <svg
-                        className="w-4 h-4 text-[#8B949E]"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                    >
-                        <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M19 9l-7 7-7-7"
-                        />
-                    </svg>
+                {/* Chevron Icon */}
+                <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none">
+                    <span className="material-symbols-outlined text-[16px] text-slate-400">expand_more</span>
                 </div>
             </div>
 
