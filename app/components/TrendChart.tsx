@@ -13,9 +13,9 @@ interface TrendChartProps {
 const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
         return (
-            <div className="bg-[#161B22] border border-[#30363D] rounded-lg p-3 shadow-xl">
-                <p className="text-[#8B949E] text-sm mb-1">{label}</p>
-                <p className="text-white font-bold text-lg">
+            <div className="bg-white border border-slate-200 rounded-lg p-3 shadow-xl">
+                <p className="text-slate-500 text-sm mb-1">{label}</p>
+                <p className="text-slate-900 font-bold text-lg">
                     {payload[0].value}
                 </p>
             </div>
@@ -26,10 +26,18 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 
 export function TrendChart({ data, title }: TrendChartProps) {
     return (
-        <div className="metric-card mt-8">
-            <div className="mb-6">
-                <h3 className="text-lg font-semibold text-white">{title}</h3>
-                <p className="text-sm text-[#8B949E] mt-1">Last 7 days performance</p>
+        <div className="glass-panel bg-white rounded-3xl p-8 shadow-soft border border-slate-200 relative overflow-hidden">
+            <div className="flex justify-between items-center mb-8">
+                <div>
+                    <h3 className="text-xl font-bold text-slate-900">{title}</h3>
+                    <p className="text-sm text-slate-500 mt-1">Ingresos generados en los últimos 7 días</p>
+                </div>
+                <div className="text-right">
+                    <span className="block text-3xl font-bold text-primary">
+                        ${data.reduce((sum, item) => sum + item.value, 0).toLocaleString()}
+                    </span>
+                    <span className="text-sm text-slate-400">Ingresos Totales</span>
+                </div>
             </div>
 
             <ResponsiveContainer width="100%" height={300}>
@@ -39,21 +47,21 @@ export function TrendChart({ data, title }: TrendChartProps) {
                 >
                     <defs>
                         <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor="#7C3AED" stopOpacity={0.3} />
+                            <stop offset="5%" stopColor="#7C3AED" stopOpacity={0.2} />
                             <stop offset="95%" stopColor="#7C3AED" stopOpacity={0} />
                         </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#30363D" />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
                     <XAxis
                         dataKey="date"
-                        stroke="#8B949E"
-                        tick={{ fill: '#8B949E', fontSize: 12 }}
-                        tickLine={{ stroke: '#30363D' }}
+                        stroke="#9CA3AF"
+                        tick={{ fill: '#9CA3AF', fontSize: 12 }}
+                        tickLine={{ stroke: '#E5E7EB' }}
                     />
                     <YAxis
-                        stroke="#8B949E"
-                        tick={{ fill: '#8B949E', fontSize: 12 }}
-                        tickLine={{ stroke: '#30363D' }}
+                        stroke="#9CA3AF"
+                        tick={{ fill: '#9CA3AF', fontSize: 12 }}
+                        tickLine={{ stroke: '#E5E7EB' }}
                     />
                     <Tooltip content={<CustomTooltip />} />
                     <Area

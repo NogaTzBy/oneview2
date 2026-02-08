@@ -3,72 +3,86 @@
 @tailwind utilities;
 
 @layer base {
-  * {
-    @apply border-[#30363D];
-  }
-  
   body {
-    @apply bg-[#0D1117] text-white antialiased;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+    @apply bg-[#F5F5F7] text-slate-900 antialiased;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 }
 
 @layer components {
-  /* Dark Mode Card */
-  .card {
-    @apply bg-[#161B22] rounded-xl border border-[#30363D] shadow-lg;
+
+  /* Glass Panel Effect */
+  .glass-panel {
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
   }
-  
-  /* Purple Primary Button */
-  .btn-primary {
-    @apply bg-[#7C3AED] text-white rounded-lg px-6 py-3 font-medium 
-           hover:bg-[#8B5CF6] active:scale-[0.98] transition-all duration-200
-           shadow-md hover:shadow-purple-500/50;
+
+  .glass-panel:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.08);
   }
-  
-  /* Secondary Dark Button */
-  .btn-secondary {
-    @apply bg-[#161B22] text-white rounded-lg px-6 py-3 font-medium border border-[#30363D]
-           hover:bg-[#1A1F2B] hover:border-[#7C3AED] active:scale-[0.98] transition-all duration-200;
+
+  /* Purple Highlight for Featured Metrics */
+  .purple-highlight {
+    background: linear-gradient(135deg, rgba(124, 58, 237, 0.15) 0%, rgba(124, 58, 237, 0.05) 100%);
+    border: 1px solid rgba(124, 58, 237, 0.2);
   }
-  
+
   /* Metric Card */
   .metric-card {
-    @apply bg-[#161B22] rounded-xl border border-[#30363D] p-6 
-           hover:border-[#7C3AED]/50 transition-all duration-300;
+    @apply glass-panel bg-white/70 rounded-2xl p-6 shadow-soft;
   }
-  
+
   /* Trend Positive */
   .trend-up {
-    @apply text-[#3FB950];
+    @apply text-green-500;
   }
-  
+
   /* Trend Negative */
   .trend-down {
-    @apply text-[#F85149];
+    @apply text-red-500;
   }
-  
-  /* Purple Glow */
-  .glow-purple {
-    box-shadow: 0 0 20px rgba(124, 58, 237, 0.3);
+
+  /* Primary Button */
+  .btn-primary {
+    @apply bg-[#7C3AED] text-white rounded-lg px-6 py-3 font-medium hover:bg-[#8B5CF6] active:scale-[0.98] transition-all duration-200 shadow-md hover:shadow-lg;
+  }
+
+  /* Secondary Button */
+  .btn-secondary {
+    @apply bg-white border border-slate-200 rounded-lg px-4 py-2 text-sm font-medium shadow-sm hover:shadow-md transition-all;
   }
 }
 
-/* Scrollbar Dark */
+/* Scrollbar Light Theme */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #0D1117;
+  background: #F5F5F7;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #30363D;
+  background: #D1D5DB;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #484F58;
+  background: #9CA3AF;
+}
+
+/* No scrollbar utility */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
