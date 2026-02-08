@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Project } from '../lib/types';
 
 interface ConfigTabIngestaProps {
@@ -8,7 +8,123 @@ interface ConfigTabIngestaProps {
     onRefresh: () => void;
 }
 
+const EVENT_TYPES = [
+    { key: 'conversation_started', label: 'Conversación Iniciada', icon: 'chat_bubble_outline' },
+    { key: 'conversation_closed', label: 'Conversación Cerrada', icon: 'check_circle' },
+    { key: 'human_escalation', label: 'Derivación a Humano', icon: 'person' },
+    { key: 'complaint', label: 'Reclamo Creado', icon: 'warning' },
+    { key: 'ai_purchase', label: 'Compra por IA', icon: 'shopping_bag' },
+    { key: 'pending_payment_sent', label: 'Pago Pendiente Enviado', icon: 'schedule' },
+    { key: 'confirmed_payment_sent', label: 'Pago Confirmado Enviado', icon: 'check_circle' },
+    { key: 'tracking_code_sent', label: 'Código de Rastreo Enviado', icon: 'local_shipping' },
+    { key: 'template_opened', label: 'Apertura con Plantilla', icon: 'mail' },
+    { key: 'window_24h_opened', label: 'Ventana 24h Abierta', icon: 'schedule' },
+];
+
 export function ConfigTabIngesta({ project, onRefresh }: ConfigTabIngestaProps) {
+    const [selectedEvent, setSelectedEvent] = useState(EVENT_TYPES[0]);
+    const [showToken, setShowToken] = useState(false);
+    const [copied, setCopied] = useState(false);
+
+    const handleCopy = (text: string) => {
+        navigator.clipboard.writeText(text);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+    };
+
+    const generateCurl = (eventType: string) => {
+        const token = project.ingest_token || 'sk_live_...';
+        const examples: Record<string, any> = {
+            'conversation_started': {
+                event_type: 'conversation_started',
+                project_id: project.id,
+                conversation_id: 'conv_12345',
+                channel: 'whatsapp',
+                created_at: new Date().toISOString()
+            },
+            'conversation_closed': {
+                event_type: 'conversation_closed',
+                project_id: project.id,
+                conversation_id: 'conv_12345',
+                channel: 'whatsapp',
+                created_at: new Date().toISOString()
+            },
+            'human_escalation': {
+                event_type: 'human_escalation',
+                project_id: project.id,
+                conversation_id: 'conv_12345',
+                channel: 'whatsapp',
+                created_at: new Date().toISOString()
+            },
+            'complaint': {
+                event_type: 'complaint',
+                project_id: project.id,
+                conversation_id: 'conv_12345',
+                channel: 'whatsapp',
+                metadata: { reason: 'producto defectuoso' },
+                created_at: new Date().toISOString()
+            },
+            'ai_purchase': {
+                event_type: 'ai_purchase',
+                project_id: project.id,
+                conversation_id: 'conv_12345',
+                channel: 'whatsapp',
+                metadata: { amount: 12500, currency: 'ARS', product_name: 'Producto X' },
+                created_at: new Date().toISOString()
+            },
+            'pending_payment_sent': {
+                event_type: 'pending_payment_sent',
+                project_id: project.id,
+                conversation_id: 'conv_12345',
+                channel: 'whatsapp',
+                created_at: new Date().toISOString()
+            },
+            'confirmed_payment_sent': {
+                event_type: 'confirmed_payment_sent',
+                project_id: project.id,
+                conversation_id: 'conv_12345',
+                channel: 'whatsapp',
+                created_at: new Date().toISOString()
+            },
+            'tracking_code_sent': {
+                event_type: 'tracking_code_sent',
+                project_id: project.id,
+                conversation_id: 'conv_12345',
+                channel: 'whatsapp',
+                metadata: { tracking_code: 'ABC123XYZ' },
+                created_at: new Date().toISOString()
+            },
+            'template_opened': {
+                event_type: 'template_opened',
+                project_id: project.id,
+                conversation_id: 'conv_12345',
+                channel: 'whatsapp',
+                metadata: { template_name: 'bienvenida' },
+                created_at: new Date().toISOString()
+            },
+            'window_24h_opened': {
+                event_type: 'window_24h_opened',
+                project_id: project.id,
+                conversation_id: 'conv_12345',
+                channel: 'whatsapp',
+                created_at: new Date().toISOString()
+            }
+        };
+
+        const payload = examples[eventType] || examples['conversation_started'];
+
+        return `curl -X POST https://api.oneview.io/v1/events \\
+  -H "Authorization: Bearer ${token}" \\
+  -H "Content-Type: application/json" \\
+  -d '${JSON.stringify(payload, null, 2)}'`;
+    };
+
+    const displayToken = showToken
+        ? project.ingest_token
+        : project.ingest_token
+            ? `${project.ingest_token.substring(0, 12)}...${project.ingest_token.substring(project.ingest_token.length - 8)}`
+            : 'sk_live_...';
+
     return (
         <div className="space-y-6">
             <div>
@@ -25,23 +141,43 @@ export function ConfigTabIngesta({ project, onRefresh }: ConfigTabIngestaProps) 
                         <h4 className="text-base font-semibold text-slate-900">Token de Ingestión</h4>
                         <p className="text-sm text-slate-500 mt-1">Utiliza este token para autenticar tus peticiones.</p>
                     </div>
-                    <span className="px-2 py-1 bg-green-100 text-green-700 text-xs font-bold rounded uppercase tracking-wide">
+                    <span className="px-3 py-1 bg-green-100 text-green-700 text-xs font-bold rounded uppercase tracking-wide">
                         Activo
                     </span>
                 </div>
 
-                <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg border border-slate-200">
-                    <code className="text-sm font-mono text-slate-700 flex-1">
-                        {project.ingest_token || 'sk_live_...'}
-                    </code>
-                    <button className="flex items-center gap-2 bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
-                        <span className="material-symbols-outlined text-[18px]">content_copy</span>
-                        Copiar
+                <div className="flex items-center gap-3">
+                    <div className="flex-1 flex items-center gap-3 p-3 bg-slate-50 rounded-lg border border-slate-200">
+                        <code className="text-sm font-mono text-slate-700 flex-1">
+                            {displayToken}
+                        </code>
+                        <button
+                            onClick={() => setShowToken(!showToken)}
+                            className="text-slate-400 hover:text-slate-600 transition-colors"
+                        >
+                            <span className="material-symbols-outlined text-[20px]">
+                                {showToken ? 'visibility' : 'visibility_off'}
+                            </span>
+                        </button>
+                    </div>
+                    <button
+                        onClick={() => handleCopy(project.ingest_token || '')}
+                        className="flex items-center gap-2 bg-primary hover:bg-primary-dark text-white px-4 py-3 rounded-lg text-sm font-medium transition-colors shadow-sm"
+                    >
+                        <span className="material-symbols-outlined text-[18px]">
+                            {copied ? 'check' : 'content_copy'}
+                        </span>
+                        {copied ? 'Copiado' : 'Copiar'}
                     </button>
                 </div>
+
+                <p className="mt-3 text-xs text-slate-400 flex items-center gap-1">
+                    <span className="material-symbols-outlined text-xs">info</span>
+                    No compartas este token en repositorios públicos.
+                </p>
             </div>
 
-            {/* Endpoint  URL */}
+            {/* Endpoint URL */}
             <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
                 <h4 className="text-base font-semibold text-slate-900 mb-3">URL del Endpoint</h4>
                 <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg border border-slate-200">
@@ -49,9 +185,63 @@ export function ConfigTabIngesta({ project, onRefresh }: ConfigTabIngestaProps) 
                     <code className="text-sm font-mono text-slate-700 flex-1">
                         https://api.oneview.io/v1/events
                     </code>
-                    <button className="text-slate-400 hover:text-primary transition-colors">
+                    <button
+                        onClick={() => handleCopy('https://api.oneview.io/v1/events')}
+                        className="text-slate-400 hover:text-primary transition-colors"
+                    >
                         <span className="material-symbols-outlined text-[18px]">content_copy</span>
                     </button>
+                </div>
+            </div>
+
+            {/* cURL Generator */}
+            <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                <div className="p-6 border-b border-slate-200">
+                    <h4 className="text-base font-semibold text-slate-900">Generador de cURL</h4>
+                    <p className="text-sm text-slate-500 mt-1">Prueba tu integración enviando un evento de ejemplo.</p>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-3 divide-y lg:divide-y-0 lg:divide-x divide-slate-200">
+                    {/* Event Type Selector */}
+                    <div className="p-6 bg-slate-50/50">
+                        <label className="block text-sm font-medium text-slate-700 mb-3">Tipo de Evento</label>
+                        <div className="space-y-2">
+                            {EVENT_TYPES.map((event) => (
+                                <button
+                                    key={event.key}
+                                    onClick={() => setSelectedEvent(event)}
+                                    className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${selectedEvent.key === event.key
+                                            ? 'bg-primary text-white'
+                                            : 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-200'
+                                        }`}
+                                >
+                                    <span className="material-symbols-outlined text-[18px]">
+                                        {event.icon}
+                                    </span>
+                                    {event.label}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* cURL Code Block */}
+                    <div className="col-span-1 lg:col-span-2 bg-[#1e1e1e] p-6 overflow-x-auto">
+                        <div className="flex justify-between items-start mb-3">
+                            <span className="text-xs font-mono text-slate-400 uppercase">Bash</span>
+                            <button
+                                onClick={() => handleCopy(generateCurl(selectedEvent.key))}
+                                className="text-slate-400 hover:text-white transition-colors flex items-center gap-1 text-xs"
+                            >
+                                <span className="material-symbols-outlined text-sm">
+                                    {copied ? 'check' : 'content_copy'}
+                                </span>
+                                {copied ? 'Copiado' : 'Copiar'}
+                            </button>
+                        </div>
+                        <pre className="text-xs text-slate-300 font-mono leading-relaxed whitespace-pre overflow-x-auto">
+                            {generateCurl(selectedEvent.key)}
+                        </pre>
+                    </div>
                 </div>
             </div>
         </div>
