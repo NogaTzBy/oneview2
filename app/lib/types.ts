@@ -32,19 +32,20 @@ export interface Widget {
 }
 
 export interface MetricsResponse {
-    metrics: {
+    summary: {
         conversations_started: number;
         conversations_closed: number;
         human_escalations: number;
         complaints: number;
         ai_purchases: number;
-        pending_payment_sent: number;
-        confirmed_payment_sent: number;
-        tracking_codes: number;
+        closure_rate: number;
         template_opens: number;
         windows_24h: number;
-        closure_rate: number;
     };
+    trend?: Array<{
+        date: string;
+        value: number;
+    }>;
     total_events: number;
     date_range: {
         from: string | null;
