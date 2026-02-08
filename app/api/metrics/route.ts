@@ -111,6 +111,99 @@ export async function GET(request: NextRequest) {
             );
         }
 
+        // Calculate previous day metrics for comparison
+        const trends: Record<string, number> = {};
+
+        if (from && to) {
+            const yesterday = new Date(to);
+            yesterday.setDate(yesterday.getDate() - 1);
+            const yesterdayStr = yesterday.toISOString().split('T')[0];
+
+            const { data: yesterdayEvents } = await supabase
+                .from('ai_events')
+                .select('event_type, conversation_id')
+                .eq('project_id', projectId)
+                .gte('created_at', yesterdayStr)
+                .lt('created_at', to);
+
+            if (yesterdayEvents && yesterdayEvents.length > 0) {
+                const yesterdayMetrics = {
+                    conversations_started: 0,
+                    conversations_closed: 0,
+                    closure_rate: 0,
+                    human_escalations: 0,
+                    complaints: 0,
+                    ai_purchases: 0,
+                    pending_payment_sent: 0,
+                    confirmed_payment_sent: 0,
+                    tracking_codes: 0,
+                    template_opens: 0,
+                    windows_24h: 0,
+                };
+
+                const yesterdayConvSet = new Set<string>();
+                const yesterdayClosedSet = new Set<string>();
+
+                yesterdayEvents.forEach((event) => {
+                    switch (event.event_type) {
+                        case 'conversation_started':
+                            yesterdayMetrics.conversations_started++;
+                            yesterdayConvSet.add(event.conversation_id);
+                            break;
+                        case 'conversation_closed':
+                            yesterdayMetrics.conversations_closed++;
+                            yesterdayClosedSet.add(event.conversation_id);
+                            break;
+                        case 'human_escalation':
+                            yesterdayMetrics.human_escalations++;
+                            break;
+                        case 'complaint':
+                            yesterdayMetrics.complaints++;
+                            break;
+                        case 'ai_purchase':
+                            yesterdayMetrics.ai_purchases++;
+                            break;
+                        case 'pending_payment_sent':
+                            yesterdayMetrics.pending_payment_sent++;
+                            break;
+                        case 'confirmed_payment_sent':
+                            yesterdayMetrics.confirmed_payment_sent++;
+                            break;
+                        case 'tracking_code_sent':
+                            yesterdayMetrics.tracking_codes++;
+                            break;
+                        case 'template_opened':
+                            yesterdayMetrics.template_opens++;
+                            break;
+                        case 'window_24h_opened':
+                            yesterdayMetrics.windows_24h++;
+                            break;
+                    }
+                });
+
+                if (yesterdayConvSet.size > 0) {
+                    yesterdayMetrics.closure_rate = Math.round(
+                        (yesterdayClosedSet.size / yesterdayConvSet.size) * 100
+                    );
+                }
+
+                // Calculate percentage changes
+                const calculateTrend = (current: number, previous: number): number => {
+                    if (previous === 0) return current > 0 ? 100 : 0;
+                    return Math.round(((current - previous) / previous) * 100);
+                };
+
+                trends.conversations_started = calculateTrend(metrics.conversations_started, yesterdayMetrics.conversations_started);
+                trends.conversations_closed = calculateTrend(metrics.conversations_closed, yesterdayMetrics.conversations_closed);
+                trends.closure_rate = calculateTrend(metrics.closure_rate, yesterdayMetrics.closure_rate);
+                trends.human_escalations = calculateTrend(metrics.human_escalations, yesterdayMetrics.human_escalations);
+                trends.complaints = calculateTrend(metrics.complaints, yesterdayMetrics.complaints);
+                trends.ai_purchases = calculateTrend(metrics.ai_purchases, yesterdayMetrics.ai_purchases);
+                trends.template_opens = calculateTrend(metrics.template_opens, yesterdayMetrics.template_opens);
+                trends.windows_24h = calculateTrend(metrics.windows_24h, yesterdayMetrics.windows_24h);
+            }
+        }
+
         // Generate trend data if requested
         let trend: Array<{ date: string; value: number }> | undefined;
         if (includeTrend && from && to) {
@@ -119,6 +212,7 @@ export async function GET(request: NextRequest) {
 
         return NextResponse.json({
             summary: metrics,
+            trends,
             trend,
             total_events: events.length,
             date_range: { from, to },

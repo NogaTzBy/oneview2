@@ -17,6 +17,7 @@ export default function DashboardPage() {
     const { selectedProject } = useProject();
     const { unreadCount, notifications } = useNotifications();
     const [metrics, setMetrics] = useState<Record<string, number> | null>(null);
+    const [trends, setTrends] = useState<Record<string, number>>({});
     const [trendData, setTrendData] = useState<any[]>([]);
     const [widgets, setWidgets] = useState<Widget[]>([]);
     const [dateRange, setDateRange] = useState<DateRange>({ from: '', to: '', label: 'Últimos 7 Días' });
@@ -69,6 +70,7 @@ export default function DashboardPage() {
             if (response.ok) {
                 const data: MetricsResponse = await response.json();
                 setMetrics(data.summary);
+                setTrends(data.trends || {});
                 setTrendData(data.trend || []);
             }
         } catch (error) {
@@ -182,10 +184,10 @@ export default function DashboardPage() {
                     </div>
                 ) : metrics ? (
                     <>
-                        {/* Metrics Grid */}
-                        <MetricsGrid metrics={metrics} widgets={widgets} />
-
-                        {/* Trend Chart */}
+                        {/* Métricas */}
+                        {metrics && (
+                            <MetricsGrid metrics={metrics} widgets={widgets} trends={trends} />
+                        )} {/* Trend Chart */}
                         {trendData.length > 0 && (
                             <TrendChart
                                 data={trendData}

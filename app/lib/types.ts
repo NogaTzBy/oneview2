@@ -42,6 +42,7 @@ export interface MetricsResponse {
         template_opens: number;
         windows_24h: number;
     };
+    trends?: Record<string, number>;
     trend?: Array<{
         date: string;
         value: number;

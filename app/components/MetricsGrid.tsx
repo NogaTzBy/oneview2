@@ -4,9 +4,10 @@ import { Metric, Widget } from '../lib/types';
 interface MetricsGridProps {
     metrics: Record<string, number>;
     widgets: Widget[];
+    trends?: Record<string, number>;
 }
 
-export function MetricsGrid({ metrics, widgets }: MetricsGridProps) {
+export function MetricsGrid({ metrics, widgets, trends = {} }: MetricsGridProps) {
     // Definir las 8 tarjetas exactamente como en el HTML de referencia
     const metricCards = [
         {
@@ -14,21 +15,21 @@ export function MetricsGrid({ metrics, widgets }: MetricsGridProps) {
             title: 'Conversaciones Iniciadas',
             icon: 'chat_bubble_outline',
             value: metrics.conversations_started || 0,
-            trend: 12,
+            trend: trends.conversations_started,
         },
         {
             key: 'conversations_closed',
             title: 'Conversaciones Cerradas',
             icon: 'check_circle_outline',
             value: metrics.conversations_closed || 0,
-            trend: 8,
+            trend: trends.conversations_closed,
         },
         {
             key: 'closure_rate',
             title: 'Tasa de Cierre',
             icon: 'pie_chart',
             value: `${metrics.closure_rate || 0}%`,
-            trend: 5.4,
+            trend: trends.closure_rate,
             highlighted: true, // Tarjeta destacada con purple-highlight
         },
         {
@@ -36,35 +37,35 @@ export function MetricsGrid({ metrics, widgets }: MetricsGridProps) {
             title: 'Ingresos por IA',
             icon: 'shopping_bag',
             value: `$${(metrics.ai_purchases || 0).toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}k`,
-            trend: 24,
+            trend: trends.ai_purchases,
         },
         {
             key: 'human_escalations',
             title: 'Derivaciones a Humano',
             icon: 'person_outline',
             value: metrics.human_escalations || 0,
-            trend: -2,
+            trend: trends.human_escalations,
         },
         {
             key: 'complaints',
             title: 'Reclamos Abiertos',
             icon: 'warning_amber',
             value: metrics.complaints || 0,
-            trend: 0,
+            trend: trends.complaints,
         },
         {
             key: 'template_opens',
             title: 'Aperturas de Plantilla',
             icon: 'mail_outline',
             value: metrics.template_opens || 0,
-            trend: 15,
+            trend: trends.template_opens,
         },
         {
             key: 'windows_24h',
             title: 'Respuesta Ventana 24h',
             icon: 'schedule',
             value: `${metrics.windows_24h || 0}%`,
-            trend: undefined, // Sin badge de tendencia
+            trend: trends.windows_24h,
         },
     ];
 
