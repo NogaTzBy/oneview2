@@ -199,9 +199,9 @@ export default function DashboardPage() {
                         {/* Email Marketing Metrics */}
                         {metrics && (
                             <EmailMetricsGrid metrics={{
-                                email_cart_abandoned: metrics.summary.email_cart_abandoned,
-                                email_buyer_x1: metrics.summary.email_buyer_x1,
-                                email_buyer_recurring: metrics.summary.email_buyer_recurring
+                                email_cart_abandoned: metrics.email_cart_abandoned,
+                                email_buyer_x1: metrics.email_buyer_x1,
+                                email_buyer_recurring: metrics.email_buyer_recurring
                             }} />
                         )}
                     </>
