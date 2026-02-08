@@ -1,16 +1,18 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { DateRangePicker } from '../components/DateRangePicker';
 import { MetricsGrid } from '../components/MetricsGrid';
 import { TrendChart } from '../components/TrendChart';
 import { ConfigModal } from '../components/ConfigModal';
+import { ProjectSelector } from '../components/ProjectSelector';
 import { DateRange, MetricsResponse, Widget, Project } from '../lib/types';
-
-// For MVP, hardcode the project ID (first project from database)
-const PROJECT_ID = process.env.NEXT_PUBLIC_PROJECT_ID || '';
+import { useProject } from '../context/ProjectContext';
+import { createClient } from '../lib/supabase-client';
 
 export default function DashboardPage() {
+    const { selectedProject } = useProject();
     const [dateRange, setDateRange] = useState<DateRange>({
         from: new Date().toISOString().split('T')[0],
         to: new Date().toISOString().split('T')[0],
@@ -22,12 +24,16 @@ export default function DashboardPage() {
     const [project, setProject] = useState<Project | null>(null);
     const [loading, setLoading] = useState(true);
     const [configOpen, setConfigOpen] = useState(false);
+    const router = useRouter();
+    const supabase = createClient();
 
     const fetchMetrics = async () => {
+        if (!selectedProject) return;
+
         try {
             setLoading(true);
             const response = await fetch(
-                `/api/metrics?project_id=${PROJECT_ID}&from=${dateRange.from}&to=${dateRange.to}&trend=true&metric_key=ai_purchase`
+                `/api/metrics?project_id=${selectedProject.id}&from=${dateRange.from}&to=${dateRange.to}&trend=true&metric_key=ai_purchase`
             );
             const data = await response.json();
             setMetrics(data.metrics);
@@ -40,8 +46,10 @@ export default function DashboardPage() {
     };
 
     const fetchConfig = async () => {
+        if (!selectedProject) return;
+
         try {
-            const response = await fetch(`/api/config?project_id=${PROJECT_ID}`);
+            const response = await fetch(`/api/config?project_id=${selectedProject.id}`);
             const data = await response.json();
             setWidgets(data.widgets || []);
             setProject(data.project || null);
@@ -50,15 +58,29 @@ export default function DashboardPage() {
         }
     };
 
-    useEffect(() => {
-        fetchConfig();
-    }, []);
+    const handleLogout = async () => {
+        await supabase.auth.signOut();
+        router.push('/login');
+        router.refresh();
+    };
 
     useEffect(() => {
-        if (PROJECT_ID) {
+        if (selectedProject) {
+            fetchConfig();
             fetchMetrics();
         }
-    }, [dateRange]);
+    }, [selectedProject, dateRange]);
+
+    if (!selectedProject) {
+        return (
+            <div className="min-h-screen bg-[#0D1117] flex items-center justify-center">
+                <div className="text-center">
+                    <div className="w-12 h-12 border-4 border-[#7C3AED] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                    <p className="text-[#8B949E]">Cargando proyectos...</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-[#0D1117]">
@@ -74,6 +96,8 @@ export default function DashboardPage() {
                         </div>
 
                         <div className="flex items-center gap-3">
+                            <ProjectSelector />
+
                             <DateRangePicker value={dateRange} onChange={setDateRange} />
 
                             <button
@@ -90,6 +114,14 @@ export default function DashboardPage() {
                             >
                                 <span className="text-lg">⚙️</span>
                                 Configurar
+                            </button>
+
+                            <button
+                                onClick={handleLogout}
+                                className="flex items-center gap-2 px-4 py-2 bg-[#161B22] border border-[#30363D] rounded-lg hover:border-[#F85149] hover:text-[#F85149] transition-colors text-white"
+                                title="Cerrar sesión"
+                            >
+                                <span className="text-lg">🚪</span>
                             </button>
                         </div>
                     </div>
