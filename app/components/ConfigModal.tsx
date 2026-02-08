@@ -22,44 +22,46 @@ export function ConfigModal({ isOpen, onClose, project, onRefresh }: ConfigModal
     if (!isOpen || !project) return null;
 
     const tabs: { key: TabKey; label: string; icon: string }[] = [
-        { key: 'general', label: 'General', icon: '⚙️' },
-        { key: 'ingesta', label: 'Ingesta', icon: '📥' },
-        { key: 'webhook', label: 'Webhook', icon: '🔔' },
-        { key: 'backups', label: 'Respaldos', icon: '💾' },
+        { key: 'general', label: 'General', icon: 'tune' },
+        { key: 'ingesta', label: 'Ingesta', icon: 'cloud_upload' },
+        { key: 'webhook', label: 'Webhook', icon: 'webhook' },
+        { key: 'backups', label: 'Respaldos', icon: 'backup' },
     ];
 
     return (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
-            <div className="bg-[#161B22] rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col border border-[#30363D]">
+        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-2xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col border border-slate-200">
                 {/* Header */}
-                <div className="p-6 border-b border-[#30363D]">
+                <div className="px-6 py-4 border-b border-slate-200">
                     <div className="flex items-center justify-between">
-                        <h2 className="text-xl font-bold text-white">Configuración del Proyecto</h2>
+                        <h2 className="text-xl font-semibold text-slate-900 tracking-tight">Configuración del Proyecto</h2>
                         <button
                             onClick={onClose}
-                            className="text-[#8B949E] hover:text-white text-2xl transition-colors"
+                            className="p-1.5 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors"
                         >
-                            ×
+                            <span className="material-symbols-outlined text-[20px]">close</span>
                         </button>
                     </div>
                 </div>
 
                 {/* Tabs */}
-                <div className="border-b border-[#30363D]">
+                <div className="border-b border-slate-200 bg-slate-50/50">
                     <nav className="flex px-6" aria-label="Tabs">
                         {tabs.map((tab) => (
                             <button
                                 key={tab.key}
                                 onClick={() => setActiveTab(tab.key)}
                                 className={`
-                                    px-4 py-3 text-sm font-medium border-b-2 transition-colors
+                                    flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors
                                     ${activeTab === tab.key
-                                        ? 'border-[#7C3AED] text-[#7C3AED]'
-                                        : 'border-transparent text-[#8B949E] hover:text-white hover:border-[#30363D]'
+                                        ? 'border-primary text-primary'
+                                        : 'border-transparent text-slate-500 hover:text-slate-900 hover:border-slate-300'
                                     }
                                 `}
                             >
-                                <span className="mr-2">{tab.icon}</span>
+                                <span className={`material-symbols-outlined text-[18px] ${activeTab === tab.key ? 'text-primary' : ''}`}>
+                                    {tab.icon}
+                                </span>
                                 {tab.label}
                             </button>
                         ))}
@@ -67,7 +69,7 @@ export function ConfigModal({ isOpen, onClose, project, onRefresh }: ConfigModal
                 </div>
 
                 {/* Tab Content */}
-                <div className="flex-1 overflow-y-auto p-6">
+                <div className="flex-1 overflow-y-auto p-6 bg-slate-50/30">
                     {activeTab === 'general' && (
                         <ConfigTabGeneral project={project} onRefresh={onRefresh} />
                     )}

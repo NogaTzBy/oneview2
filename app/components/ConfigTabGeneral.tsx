@@ -71,57 +71,58 @@ export function ConfigTabGeneral({ project, onRefresh }: ConfigTabGeneralProps) 
     return (
         <div className="space-y-6">
             <div>
-                <h3 className="text-lg font-semibold mb-2 text-white">Configuración General</h3>
-                <p className="text-sm text-[#8B949E]">
+                <h3 className="text-lg font-semibold mb-2 text-slate-900">Configuración General</h3>
+                <p className="text-sm text-slate-500">
                     Administra la configuración básica del proyecto.
                 </p>
             </div>
 
             {/* Project Info */}
-            <div className="bg-[#1A1F2B] rounded-lg p-4 border border-[#30363D]">
-                <div className="flex items-center gap-3 mb-4">
-                    <div className="w-12 h-12 bg-[#7C3AED]/20 rounded-lg flex items-center justify-center">
-                        <span className="text-2xl">📊</span>
+            <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
+                <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
+                        <span className="material-symbols-outlined text-primary text-2xl">dataset</span>
                     </div>
                     <div>
-                        <div className="text-white font-semibold">{project.name}</div>
-                        <div className="text-xs text-[#8B949E] font-mono">{project.id}</div>
+                        <div className="text-slate-900 font-semibold">{project.name}</div>
+                        <div className="text-xs text-slate-400 font-mono mt-0.5">{project.id}</div>
                     </div>
                 </div>
             </div>
 
             {/* Name Input */}
-            <div className="bg-[#1A1F2B] rounded-lg p-4 border border-[#30363D]">
-                <label className="block text-sm font-medium text-white mb-2">
+            <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
+                <label className="block text-sm font-medium text-slate-700 mb-3">
                     Nombre del Proyecto
                 </label>
                 <input
                     type="text"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="w-full px-4 py-3 bg-[#0D1117] border border-[#30363D] rounded-lg text-white placeholder-[#8B949E] focus:border-[#7C3AED] focus:ring-1 focus:ring-[#7C3AED] outline-none transition-colors"
+                    className="w-full px-4 py-3 bg-white border border-slate-200 rounded-lg text-slate-900 placeholder-slate-400 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
                     placeholder="Ej: Mi Tienda"
                 />
             </div>
 
             {/* Timezone Select */}
-            <div className="bg-[#1A1F2B] rounded-lg p-4 border border-[#30363D]">
-                <label className="block text-sm font-medium text-white mb-2">
+            <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
+                <label className="block text-sm font-medium text-slate-700 mb-3">
                     Zona Horaria
                 </label>
                 <select
                     value={timezone}
                     onChange={(e) => setTimezone(e.target.value)}
-                    className="w-full px-4 py-3 bg-[#0D1117] border border-[#30363D] rounded-lg text-white focus:border-[#7C3AED] focus:ring-1 focus:ring-[#7C3AED] outline-none transition-colors appearance-none cursor-pointer"
+                    className="w-full px-4 py-3 bg-white border border-slate-200 rounded-lg text-slate-900 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all cursor-pointer"
                 >
                     {TIMEZONES.map((tz) => (
-                        <option key={tz} value={tz} className="bg-[#0D1117]">
+                        <option key={tz} value={tz}>
                             {tz}
                         </option>
                     ))}
                 </select>
-                <p className="text-xs text-[#8B949E] mt-2">
-                    La zona horaria afecta el cálculo de &quot;Hoy&quot; y &quot;Este mes&quot;.
+                <p className="text-xs text-slate-400 mt-3 flex items-center gap-1">
+                    <span className="material-symbols-outlined text-xs">info</span>
+                    La zona horaria afecta el cálculo de "Hoy" y "Este mes".
                 </p>
             </div>
 
@@ -130,14 +131,16 @@ export function ConfigTabGeneral({ project, onRefresh }: ConfigTabGeneralProps) 
                 <button
                     onClick={handleSave}
                     disabled={saving || !hasChanges}
-                    className="px-6 py-3 bg-[#7C3AED] text-white rounded-lg hover:bg-[#8B5CF6] disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
+                    className="px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed transition-all font-medium shadow-sm hover:shadow flex items-center gap-2"
                 >
-                    {saving ? '⏳ Guardando...' : '💾 Guardar Cambios'}
+                    <span className="material-symbols-outlined text-[20px]">{saving ? 'sync' : 'save'}</span>
+                    {saving ? 'Guardando...' : 'Guardar Cambios'}
                 </button>
 
                 {hasChanges && (
-                    <span className="text-sm text-[#F0883E]">
-                        ⚠️ Tienes cambios sin guardar
+                    <span className="text-sm text-amber-600 flex items-center gap-1">
+                        <span className="material-symbols-outlined text-[16px]">warning</span>
+                        Tienes cambios sin guardar
                     </span>
                 )}
             </div>
