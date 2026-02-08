@@ -26,6 +26,7 @@ export default function DashboardPage() {
     const [loading, setLoading] = useState(true);
     const [configOpen, setConfigOpen] = useState(false);
     const [notificationsOpen, setNotificationsOpen] = useState(false);
+    const [showExportConfirm, setShowExportConfirm] = useState(false);
     const router = useRouter();
     const supabase = createClient();
 
@@ -116,6 +117,9 @@ export default function DashboardPage() {
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+
+        // Cerrar modal de confirmación
+        setShowExportConfirm(false);
     };
 
     useEffect(() => {
@@ -217,7 +221,7 @@ export default function DashboardPage() {
                             Actualizar
                         </button>
                         <button
-                            onClick={exportToCSV}
+                            onClick={() => setShowExportConfirm(true)}
                             disabled={!metrics || loading}
                             className="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium shadow-sm hover:shadow-md transition-all flex items-center gap-2 text-slate-900 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
@@ -271,6 +275,45 @@ export default function DashboardPage() {
                     </div>
                 )}
             </main>
+
+            {/* Export Confirmation Modal */}
+            {showExportConfirm && (
+                <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-2xl shadow-xl max-w-md w-full border border-slate-200">
+                        <div className="p-6">
+                            <div className="flex items-center gap-3 mb-4">
+                                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                                    <span className="material-symbols-outlined text-primary text-2xl">download</span>
+                                </div>
+                                <h3 className="text-lg font-semibold text-slate-900">
+                                    ¿Descargar métricas?
+                                </h3>
+                            </div>
+                            <p className="text-slate-600 mb-6">
+                                Se descargará un archivo CSV con todas las métricas del período{' '}
+                                <span className="font-medium text-slate-900">
+                                    {new Date(dateRange.from).toLocaleDateString()} - {new Date(dateRange.to).toLocaleDateString()}
+                                </span>
+                            </p>
+                            <div className="flex gap-3">
+                                <button
+                                    onClick={() => setShowExportConfirm(false)}
+                                    className="flex-1 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-medium transition-colors"
+                                >
+                                    Cancelar
+                                </button>
+                                <button
+                                    onClick={exportToCSV}
+                                    className="flex-1 px-4 py-2.5 bg-primary hover:bg-primary-dark text-white rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
+                                >
+                                    <span className="material-symbols-outlined text-[18px]">download</span>
+                                    Descargar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Config Modal */}
             <ConfigModal
