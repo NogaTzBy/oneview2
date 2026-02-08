@@ -14,7 +14,7 @@ export default function DashboardPage() {
     const [metrics, setMetrics] = useState<Record<string, number> | null>(null);
     const [trendData, setTrendData] = useState<any[]>([]);
     const [widgets, setWidgets] = useState<Widget[]>([]);
-    const [dateRange, setDateRange] = useState<DateRange>({ start: '', end: '', label: 'Últimos 7 Días' });
+    const [dateRange, setDateRange] = useState<DateRange>({ from: '', to: '', label: 'Últimos 7 Días' });
     const [project, setProject] = useState<Project | null>(null);
     const [loading, setLoading] = useState(true);
     const [configOpen, setConfigOpen] = useState(false);
@@ -27,8 +27,8 @@ export default function DashboardPage() {
         sevenDaysAgo.setDate(now.getDate() - 7);
 
         setDateRange({
-            start: sevenDaysAgo.toISOString().split('T')[0],
-            end: now.toISOString().split('T')[0],
+            from: sevenDaysAgo.toISOString().split('T')[0],
+            to: now.toISOString().split('T')[0],
             label: 'Últimos 7 Días',
         });
     }, []);
@@ -37,7 +37,7 @@ export default function DashboardPage() {
         if (!selectedProject?.id) return;
 
         try {
-            const response = await fetch(\`/api/config/\${selectedProject.id}\`);
+            const response = await fetch(`/api/config/${selectedProject.id}`);
             if (response.ok) {
                 const data = await response.json();
                 setProject(data.project);
@@ -49,7 +49,7 @@ export default function DashboardPage() {
     };
 
     const fetchMetrics = async () => {
-        if (!selectedProject?.id || !dateRange.start || !dateRange.end) {
+        if (!selectedProject?.id || !dateRange.from || !dateRange.to) {
             setLoading(false);
             return;
         }
@@ -57,7 +57,7 @@ export default function DashboardPage() {
         setLoading(true);
         try {
             const response = await fetch(
-                \`/api/metrics?projectId=\${selectedProject.id}&start=\${dateRange.start}&end=\${dateRange.end}\`
+                `/api/metrics?projectId=${selectedProject.id}&start=${dateRange.from}&end=${dateRange.to}`
             );
 
             if (response.ok) {
@@ -103,14 +103,14 @@ export default function DashboardPage() {
                             </div>
                             <span className="text-xl font-bold tracking-tight text-slate-900">OneView</span>
                         </div>
-                        
+
                         <div className="hidden md:flex items-center gap-4 pl-4 border-l border-slate-200">
                             <button className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-slate-100 transition-colors text-sm font-medium text-slate-900">
                                 <span className="material-symbols-outlined text-[20px] text-primary">storefront</span>
                                 {selectedProject?.name || 'Seleccionar Tienda'}
                                 <span className="material-symbols-outlined text-[16px] text-slate-400">expand_more</span>
                             </button>
-                            
+
                             <button className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-slate-100 transition-colors text-sm font-medium text-slate-900">
                                 <span className="material-symbols-outlined text-[20px] text-primary">calendar_today</span>
                                 {dateRange.label}
@@ -126,7 +126,7 @@ export default function DashboardPage() {
                         <button className="p-2 rounded-full hover:bg-slate-100 text-slate-500 transition-colors">
                             <span className="material-symbols-outlined">notifications</span>
                         </button>
-                        <button 
+                        <button
                             onClick={() => setConfigOpen(true)}
                             className="p-2 rounded-full hover:bg-slate-100 text-slate-500 transition-colors"
                         >
@@ -149,7 +149,7 @@ export default function DashboardPage() {
                     </div>
                     <div className="flex gap-3">
                         <button className="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium shadow-sm hover:shadow-md transition-all flex items-center gap-2 text-slate-900">
-                            <span className="material-symbols-outlined text-[18px]">download</span> 
+                            <span className="material-symbols-outlined text-[18px]">download</span>
                             Exportar
                         </button>
                     </div>
