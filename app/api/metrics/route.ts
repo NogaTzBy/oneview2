@@ -9,9 +9,9 @@ const supabase = createClient(
 export async function GET(request: NextRequest) {
     try {
         const searchParams = request.nextUrl.searchParams;
-        const projectId = searchParams.get('project_id');
-        const from = searchParams.get('from');
-        const to = searchParams.get('to');
+        const projectId = searchParams.get('projectId') || searchParams.get('project_id');
+        const from = searchParams.get('start') || searchParams.get('from');
+        const to = searchParams.get('end') || searchParams.get('to');
         const includeTrend = searchParams.get('trend') === 'true';
         const trendMetric = searchParams.get('metric_key') || 'ai_purchases';
 
@@ -118,9 +118,10 @@ export async function GET(request: NextRequest) {
         }
 
         return NextResponse.json({
-            metrics,
+            summary: metrics,
             trend,
-            period: { from, to },
+            total_events: events.length,
+            date_range: { from, to },
         });
     } catch (error) {
         console.error('Unexpected error:', error);
