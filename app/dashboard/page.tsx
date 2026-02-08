@@ -147,11 +147,12 @@ export default function DashboardPage() {
             <header className="w-full fixed top-0 left-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200/50">
                 <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
                     <div className="flex items-center gap-8">
-                        <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-white shadow-glow">
-                                <span className="material-symbols-outlined text-xl">analytics</span>
-                            </div>
-                            <span className="text-xl font-bold tracking-tight text-slate-900">OneView</span>
+                        <div className="flex items-center">
+                            <img
+                                src="/images/logo.png"
+                                alt="OneView"
+                                className="h-24 w-auto"
+                            />
                         </div>
 
                         <div className="hidden md:flex items-center gap-4 pl-4 border-l border-slate-200">

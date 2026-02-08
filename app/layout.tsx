@@ -4,6 +4,9 @@ import './globals.css'
 export const metadata: Metadata = {
   title: 'OneView - Panel de Métricas de IA',
   description: 'Dashboard de métricas para agentes de IA',
+  icons: {
+    icon: '/favicon.png',
+  },
 }
 
 export default function RootLayout({
