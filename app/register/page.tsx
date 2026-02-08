@@ -47,12 +47,15 @@ export default function RegisterPage() {
                 return;
             }
 
+            // Registro exitoso - puede tener sesión inmediata o requerir confirmación de email
             if (data.session) {
+                // Sesión creada inmediatamente
                 router.push('/dashboard');
                 router.refresh();
             } else {
-                // Email confirmation required
-                setError('Revisa tu email para confirmar tu cuenta');
+                // Email de confirmación enviado
+                // Mostrar mensaje de éxito en lugar de error
+                router.push('/login?registered=true');
             }
         } catch (err: any) {
             setError(err.message || 'Error al crear cuenta');

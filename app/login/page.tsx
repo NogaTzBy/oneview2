@@ -9,9 +9,18 @@ export default function LoginPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
     const [loading, setLoading] = useState(false);
     const router = useRouter();
     const supabase = createClient();
+
+    // Check if user just registered
+    React.useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('registered') === 'true') {
+            setSuccess('¡Cuenta creada exitosamente! Revisá tu email para confirmar tu cuenta y luego iniciá sesión.');
+        }
+    }, []);
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -56,6 +65,12 @@ export default function LoginPage() {
                     {error && (
                         <div className="mb-4 p-3 bg-[#F85149]/10 border border-[#F85149]/50 rounded-lg">
                             <p className="text-[#F85149] text-sm">{error}</p>
+                        </div>
+                    )}
+
+                    {success && (
+                        <div className="mb-4 p-3 bg-[#3FB950]/10 border border-[#3FB950]/50 rounded-lg">
+                            <p className="text-[#3FB950] text-sm">{success}</p>
                         </div>
                     )}
 
