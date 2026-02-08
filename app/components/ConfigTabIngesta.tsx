@@ -205,7 +205,7 @@ export function ConfigTabIngesta({ project, onRefresh }: ConfigTabIngestaProps) 
                     {/* Event Type Selector */}
                     <div className="p-6 bg-slate-50/50">
                         <label className="block text-sm font-medium text-slate-700 mb-3">Tipo de Evento</label>
-                        <div className="space-y-2">
+                        <div className="space-y-2 max-h-96 overflow-y-auto">
                             {EVENT_TYPES.map((event) => (
                                 <button
                                     key={event.key}
@@ -224,23 +224,50 @@ export function ConfigTabIngesta({ project, onRefresh }: ConfigTabIngestaProps) 
                         </div>
                     </div>
 
-                    {/* cURL Code Block */}
-                    <div className="col-span-1 lg:col-span-2 bg-[#1e1e1e] p-6 overflow-x-auto">
-                        <div className="flex justify-between items-start mb-3">
-                            <span className="text-xs font-mono text-slate-400 uppercase">Bash</span>
-                            <button
-                                onClick={() => handleCopy(generateCurl(selectedEvent.key))}
-                                className="text-slate-400 hover:text-white transition-colors flex items-center gap-1 text-xs"
-                            >
-                                <span className="material-symbols-outlined text-sm">
-                                    {copied ? 'check' : 'content_copy'}
-                                </span>
-                                {copied ? 'Copiado' : 'Copiar'}
-                            </button>
+                    {/* cURL & Response */}
+                    <div className="col-span-1 lg:col-span-2 divide-y divide-slate-200">
+                        {/* cURL Request */}
+                        <div className="p-6 bg-slate-50">
+                            <div className="flex justify-between items-center mb-3">
+                                <div className="flex items-center gap-2">
+                                    <span className="material-symbols-outlined text-slate-400 text-[18px]">terminal</span>
+                                    <span className="text-xs font-semibold text-slate-700 uppercase tracking-wide">Request</span>
+                                </div>
+                                <button
+                                    onClick={() => handleCopy(generateCurl(selectedEvent.key))}
+                                    className="text-slate-500 hover:text-primary transition-colors flex items-center gap-1 text-xs font-medium"
+                                >
+                                    <span className="material-symbols-outlined text-[16px]">
+                                        {copied ? 'check' : 'content_copy'}
+                                    </span>
+                                    {copied ? 'Copiado' : 'Copiar'}
+                                </button>
+                            </div>
+                            <div className="bg-white border border-slate-200 rounded-lg p-4 overflow-x-auto">
+                                <pre className="text-xs text-slate-700 font-mono leading-relaxed whitespace-pre">
+                                    {generateCurl(selectedEvent.key)}
+                                </pre>
+                            </div>
                         </div>
-                        <pre className="text-xs text-slate-300 font-mono leading-relaxed whitespace-pre overflow-x-auto">
-                            {generateCurl(selectedEvent.key)}
-                        </pre>
+
+                        {/* Response Example */}
+                        <div className="p-6 bg-white">
+                            <div className="flex items-center gap-2 mb-3">
+                                <span className="material-symbols-outlined text-green-500 text-[18px]">check_circle</span>
+                                <span className="text-xs font-semibold text-slate-700 uppercase tracking-wide">Respuesta Exitosa</span>
+                            </div>
+                            <div className="bg-green-50 border border-green-200 rounded-lg p-4 overflow-x-auto">
+                                <pre className="text-xs text-green-800 font-mono leading-relaxed">
+                                    {`{
+  "success": true,
+  "message": "Evento recibido correctamente",
+  "event_id": "evt_${Math.random().toString(36).substr(2, 9)}",
+  "event_type": "${selectedEvent.key}",
+  "timestamp": "${new Date().toISOString()}"
+}`}
+                                </pre>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
