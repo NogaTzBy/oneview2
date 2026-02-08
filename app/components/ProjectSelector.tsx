@@ -6,18 +6,19 @@ import { useProject } from '../context/ProjectContext';
 export function ProjectSelector() {
     const { selectedProject, projects, setSelectedProject, refreshProjects } = useProject();
     const [showCreateModal, setShowCreateModal] = useState(false);
+    const [isOpen, setIsOpen] = useState(false);
 
-    const handleProjectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        const value = e.target.value;
-
-        if (value === 'new') {
+    const handleProjectSelect = (projectId: string) => {
+        if (projectId === 'new') {
             setShowCreateModal(true);
+            setIsOpen(false);
             return;
         }
 
-        const project = projects.find(p => p.id === value);
+        const project = projects.find(p => p.id === projectId);
         if (project) {
             setSelectedProject(project);
+            setIsOpen(false);
         }
     };
 
@@ -27,23 +28,45 @@ export function ProjectSelector() {
                 <span className="material-symbols-outlined text-[20px] text-primary absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none z-10">
                     storefront
                 </span>
-                <select
-                    value={selectedProject?.id || ''}
-                    onChange={handleProjectChange}
-                    className="appearance-none pl-10 pr-8 py-1.5 bg-transparent border-0 rounded-lg text-slate-900 font-medium text-sm focus:outline-none focus:bg-slate-100 transition-colors cursor-pointer hover:bg-slate-100"
+                <button
+                    onClick={() => setIsOpen(!isOpen)}
+                    className="pl-10 pr-8 py-1.5 bg-transparent border-0 rounded-lg text-slate-900 font-medium text-sm focus:outline-none focus:bg-slate-100 transition-colors cursor-pointer hover:bg-slate-100 flex items-center gap-2"
                 >
-                    {projects.map((project) => (
-                        <option key={project.id} value={project.id} className="bg-white">
-                            {project.name}
-                        </option>
-                    ))}
-                    <option value="new" className="bg-white">+ Nuevo Proyecto</option>
-                </select>
-
-                {/* Chevron Icon */}
+                    {selectedProject?.name || 'Seleccionar Tienda'}
+                </button>
                 <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none">
                     <span className="material-symbols-outlined text-[16px] text-slate-400">expand_more</span>
                 </div>
+
+                {isOpen && (
+                    <>
+                        <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
+                        <div className="absolute top-full right-0 mt-2 w-64 glass-panel bg-white rounded-lg shadow-lg z-50 p-4">
+                            <div className="space-y-2">
+                                {projects.map((project) => (
+                                    <button
+                                        key={project.id}
+                                        onClick={() => handleProjectSelect(project.id)}
+                                        className={`w-full text-left px-3 py-2 rounded-lg transition-colors text-sm ${selectedProject?.id === project.id
+                                                ? 'bg-primary/10 text-primary font-medium'
+                                                : 'text-slate-900 hover:bg-slate-100'
+                                            }`}
+                                    >
+                                        {project.name}
+                                    </button>
+                                ))}
+                                <div className="border-t border-slate-200 my-2"></div>
+                                <button
+                                    onClick={() => handleProjectSelect('new')}
+                                    className="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-100 text-sm text-slate-900 transition-colors flex items-center gap-2"
+                                >
+                                    <span className="material-symbols-outlined text-[18px] text-primary">add</span>
+                                    Nuevo Proyecto
+                                </button>
+                            </div>
+                        </div>
+                    </>
+                )}
             </div>
 
             {showCreateModal && (
