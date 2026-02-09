@@ -136,7 +136,7 @@ export function ConfigTabIngesta({ project, onRefresh }: ConfigTabIngestaProps) 
 
         const payload = examples[eventType] || examples['conversation_started'];
 
-        return `curl -X POST https://api.oneview.io/v1/events \\
+        return `curl -X POST https://oneview2.vercel.app/api/ingest \\
   -H "X-INGEST-TOKEN: ${token}" \\
   -H "Content-Type: application/json" \\
   -d '${JSON.stringify(payload, null, 2)}'`;
@@ -206,12 +206,11 @@ export function ConfigTabIngesta({ project, onRefresh }: ConfigTabIngestaProps) 
                 <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg border border-slate-200">
                     <span className="material-symbols-outlined text-slate-400">link</span>
                     <code className="text-sm font-mono text-slate-700 flex-1">
-                        https://api.oneview.io/v1/events
+                        https://oneview2.vercel.app/api/ingest
                     </code>
                     <button
-                        onClick={() => handleCopy('https://api.oneview.io/v1/events')}
-                        className="text-slate-400 hover:text-primary transition-colors"
-                    >
+                        onClick={() => handleCopy('https://oneview2.vercel.app/api/ingest')}
+                        className="px-3 py-1.5 text-sm font-medium text-primary hover:bg-primary/5 rounded-lg transition-colors flex items-center gap-1.5"                  >
                         <span className="material-symbols-outlined text-[18px]">content_copy</span>
                     </button>
                 </div>
