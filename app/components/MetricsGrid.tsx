@@ -34,10 +34,10 @@ export function MetricsGrid({ metrics, widgets, trends = {} }: MetricsGridProps)
         },
         {
             key: 'ai_purchases',
-            title: 'Ingresos por IA',
-            icon: 'shopping_bag',
-            value: `$${(metrics.ai_purchases || 0).toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}k`,
-            trend: trends.ai_purchases,
+            title: 'Ventas hechas por IA',
+            icon: 'shopping_cart',
+            value: metrics.ai_purchases_count || 0,
+            trend: trends.ai_purchases_count,
         },
         {
             key: 'human_escalations',

@@ -56,7 +56,8 @@ export async function GET(request: NextRequest) {
             closure_rate: 0,
             human_escalations: 0,
             complaints: 0,
-            ai_purchases: 0,
+            ai_purchases_count: 0, // Contador de ventas
+            ai_purchases_revenue: 0, // Ingresos totales
             pending_payment_sent: 0,
             confirmed_payment_sent: 0,
             tracking_codes: 0,
@@ -87,7 +88,10 @@ export async function GET(request: NextRequest) {
                     metrics.complaints++;
                     break;
                 case 'ai_purchase':
-                    metrics.ai_purchases++;
+                    metrics.ai_purchases_count++;
+                    // Sumar el monto del metadata si existe
+                    const amount = event.metadata?.amount || event.metadata?.cart_value || 0;
+                    metrics.ai_purchases_revenue += Number(amount);
                     break;
                 case 'pending_payment_sent':
                     metrics.pending_payment_sent++;
@@ -145,7 +149,7 @@ export async function GET(request: NextRequest) {
                     closure_rate: 0,
                     human_escalations: 0,
                     complaints: 0,
-                    ai_purchases: 0,
+                    ai_purchases_count: 0,
                     pending_payment_sent: 0,
                     confirmed_payment_sent: 0,
                     tracking_codes: 0,
@@ -210,7 +214,7 @@ export async function GET(request: NextRequest) {
                 trends.closure_rate = calculateTrend(metrics.closure_rate, yesterdayMetrics.closure_rate);
                 trends.human_escalations = calculateTrend(metrics.human_escalations, yesterdayMetrics.human_escalations);
                 trends.complaints = calculateTrend(metrics.complaints, yesterdayMetrics.complaints);
-                trends.ai_purchases = calculateTrend(metrics.ai_purchases, yesterdayMetrics.ai_purchases);
+                trends.ai_purchases_count = calculateTrend(metrics.ai_purchases_count, yesterdayMetrics.ai_purchases_count);
                 trends.template_opens = calculateTrend(metrics.template_opens, yesterdayMetrics.template_opens);
                 trends.windows_24h = calculateTrend(metrics.windows_24h, yesterdayMetrics.windows_24h);
             }

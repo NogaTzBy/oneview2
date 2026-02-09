@@ -34,7 +34,7 @@ export function TrendChart({ data, title }: TrendChartProps) {
                 </div>
                 <div className="text-right">
                     <span className="block text-3xl font-bold text-primary">
-                        ${data.reduce((sum, item) => sum + item.value, 0).toLocaleString()}
+                        ${(data.reduce((sum, item) => sum + item.value, 0) / 1000).toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}k
                     </span>
                     <span className="text-sm text-slate-400">Ingresos Totales</span>
                 </div>
