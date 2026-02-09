@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
         const from = searchParams.get('start') || searchParams.get('from');
         const to = searchParams.get('end') || searchParams.get('to');
         const includeTrend = searchParams.get('trend') === 'true';
-        const trendMetric = searchParams.get('metric_key') || 'ai_purchases';
+        const trendMetric = searchParams.get('metric_key') || 'ai_purchase';
 
         if (!projectId) {
             return NextResponse.json(
