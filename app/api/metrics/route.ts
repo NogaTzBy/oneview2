@@ -263,11 +263,17 @@ function generateTrendData(
         dateCounts[dateStr] = 0;
     }
 
-    // Count events by date
+    // Sum revenue by date for ai_purchase events, count for others
     events.forEach((event) => {
         const eventDate = event.created_at.split('T')[0];
         if (dateCounts[eventDate] !== undefined && event.event_type === metricKey) {
-            dateCounts[eventDate]++;
+            // Para ai_purchase, sumar el monto; para otros eventos, contar
+            if (metricKey === 'ai_purchase') {
+                const amount = event.metadata?.amount || event.metadata?.cart_value || 0;
+                dateCounts[eventDate] += Number(amount);
+            } else {
+                dateCounts[eventDate]++;
+            }
         }
     });
 
