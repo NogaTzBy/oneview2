@@ -177,7 +177,7 @@ export async function GET(request: NextRequest) {
                             yesterdayMetrics.complaints++;
                             break;
                         case 'ai_purchase':
-                            yesterdayMetrics.ai_purchases++;
+                            yesterdayMetrics.ai_purchases_count++;
                             break;
                         case 'pending_payment_sent':
                             yesterdayMetrics.pending_payment_sent++;
