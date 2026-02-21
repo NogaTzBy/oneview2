@@ -10,6 +10,7 @@ export default function RegisterPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [dashboardType, setDashboardType] = useState('ecommerce');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const router = useRouter();
@@ -38,6 +39,7 @@ export default function RegisterPage() {
                 options: {
                     data: {
                         name,
+                        dashboard_type: dashboardType
                     },
                 },
             });
@@ -97,6 +99,36 @@ export default function RegisterPage() {
                                 className="w-full px-4 py-2 bg-[#0D1117] border border-[#30363D] rounded-lg text-white focus:outline-none focus:border-[#7C3AED] transition-colors"
                                 placeholder="Tu nombre"
                             />
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-[#C9D1D9] mb-2">
+                                Tipo de Negocio
+                            </label>
+                            <div className="grid grid-cols-2 gap-4">
+                                <label className={`flex items-center justify-center px-4 py-3 rounded-lg border cursor-pointer transition-colors ${dashboardType === 'ecommerce' ? 'bg-[#7C3AED]/10 border-[#7C3AED] text-white' : 'bg-[#0D1117] border-[#30363D] text-[#8B949E] hover:border-[#8B949E]'}`}>
+                                    <input
+                                        type="radio"
+                                        name="dashboardType"
+                                        value="ecommerce"
+                                        checked={dashboardType === 'ecommerce'}
+                                        onChange={(e) => setDashboardType(e.target.value)}
+                                        className="hidden"
+                                    />
+                                    <span className="font-medium text-sm">E-commerce</span>
+                                </label>
+                                <label className={`flex items-center justify-center px-4 py-3 rounded-lg border cursor-pointer transition-colors ${dashboardType === 'setters' ? 'bg-[#7C3AED]/10 border-[#7C3AED] text-white' : 'bg-[#0D1117] border-[#30363D] text-[#8B949E] hover:border-[#8B949E]'}`}>
+                                    <input
+                                        type="radio"
+                                        name="dashboardType"
+                                        value="setters"
+                                        checked={dashboardType === 'setters'}
+                                        onChange={(e) => setDashboardType(e.target.value)}
+                                        className="hidden"
+                                    />
+                                    <span className="font-medium text-sm">Setters IA</span>
+                                </label>
+                            </div>
                         </div>
 
                         <div>
