@@ -14,7 +14,9 @@ interface SettersDashboardProps {
 }
 
 export function SettersDashboard({ isSuperAdmin }: SettersDashboardProps) {
-    const { selectedProject } = useProject();
+    const { projects } = useProject();
+    const faProject = projects?.find(p => p.name === 'FA Interiores');
+
     const [metrics, setMetrics] = useState<Record<string, number> | null>(null);
     const [trends, setTrends] = useState<Record<string, number>>({});
     const [trendData, setTrendData] = useState<any[]>([]);
@@ -36,7 +38,7 @@ export function SettersDashboard({ isSuperAdmin }: SettersDashboardProps) {
     }, []);
 
     const fetchMetrics = async () => {
-        if (!selectedProject?.id || !dateRange.from || !dateRange.to) {
+        if (!faProject?.id || !dateRange.from || !dateRange.to) {
             setLoading(false);
             return;
         }
@@ -45,7 +47,7 @@ export function SettersDashboard({ isSuperAdmin }: SettersDashboardProps) {
         try {
             // Pasamos metric_key=ai_message_sent para que el gráfico de tendencia muestre los mensajes
             const response = await fetch(
-                `/api/metrics?projectId=${selectedProject.id}&start=${dateRange.from}&end=${dateRange.to}&trend=true&metric_key=ai_message_sent`
+                `/api/metrics?projectId=${faProject.id}&start=${dateRange.from}&end=${dateRange.to}&trend=true&metric_key=ai_message_sent`
             );
 
             if (response.ok) {
@@ -62,11 +64,11 @@ export function SettersDashboard({ isSuperAdmin }: SettersDashboardProps) {
     };
 
     useEffect(() => {
-        if (selectedProject) {
-            setProject(selectedProject);
+        if (faProject) {
+            setProject(faProject);
             fetchMetrics();
         }
-    }, [selectedProject, dateRange]);
+    }, [faProject, dateRange]);
 
     return (
         <div className="min-h-screen bg-background-light">
@@ -90,7 +92,6 @@ export function SettersDashboard({ isSuperAdmin }: SettersDashboardProps) {
                         </div>
 
                         <div className="hidden md:flex items-center gap-4 pl-4 border-l border-slate-200">
-                            <ProjectSelector />
                             <DateRangePicker
                                 value={dateRange}
                                 onChange={setDateRange}
