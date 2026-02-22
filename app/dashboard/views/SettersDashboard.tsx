@@ -1,16 +1,72 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { SettersMetricsGrid } from '../../components/SettersMetricsGrid';
+import { TrendChart } from '../../components/TrendChart';
+import { DateRange, MetricsResponse, Project } from '../../lib/types';
+import { useProject } from '../../context/ProjectContext';
+import { ProjectSelector } from '../../components/ProjectSelector';
+import { DateRangePicker } from '../../components/DateRangePicker';
 
 interface SettersDashboardProps {
     isSuperAdmin?: boolean;
 }
 
 export function SettersDashboard({ isSuperAdmin }: SettersDashboardProps) {
+    const { selectedProject } = useProject();
+    const [metrics, setMetrics] = useState<Record<string, number> | null>(null);
+    const [trends, setTrends] = useState<Record<string, number>>({});
+    const [trendData, setTrendData] = useState<any[]>([]);
+    const [dateRange, setDateRange] = useState<DateRange>({ from: '', to: '', label: 'Últimos 7 Días' });
+    const [project, setProject] = useState<Project | null>(null);
+    const [loading, setLoading] = useState(true);
     const router = useRouter();
-    // TODO: implement real metrics fetch and logic for FA Interiores Setters IA
-    const [loading] = useState(false);
+
+    useEffect(() => {
+        const now = new Date();
+        const sevenDaysAgo = new Date(now);
+        sevenDaysAgo.setDate(now.getDate() - 7);
+
+        setDateRange({
+            from: sevenDaysAgo.toISOString().split('T')[0],
+            to: now.toISOString().split('T')[0],
+            label: 'Últimos 7 Días',
+        });
+    }, []);
+
+    const fetchMetrics = async () => {
+        if (!selectedProject?.id || !dateRange.from || !dateRange.to) {
+            setLoading(false);
+            return;
+        }
+
+        setLoading(true);
+        try {
+            // Pasamos metric_key=ai_message_sent para que el gráfico de tendencia muestre los mensajes
+            const response = await fetch(
+                `/api/metrics?projectId=${selectedProject.id}&start=${dateRange.from}&end=${dateRange.to}&trend=true&metric_key=ai_message_sent`
+            );
+
+            if (response.ok) {
+                const data: MetricsResponse = await response.json();
+                setMetrics(data.summary);
+                setTrends(data.trends || {});
+                setTrendData(data.trend || []);
+            }
+        } catch (error) {
+            console.error('Error fetching metrics:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        if (selectedProject) {
+            setProject(selectedProject);
+            fetchMetrics();
+        }
+    }, [selectedProject, dateRange]);
 
     return (
         <div className="min-h-screen bg-background-light">
@@ -31,6 +87,14 @@ export function SettersDashboard({ isSuperAdmin }: SettersDashboardProps) {
                             <h2 className="text-xl font-bold text-slate-900 hidden md:block border-l pl-4 ml-2 max-h-[40px]">
                                 FA Interiores (Setters IA)
                             </h2>
+                        </div>
+
+                        <div className="hidden md:flex items-center gap-4 pl-4 border-l border-slate-200">
+                            <ProjectSelector />
+                            <DateRangePicker
+                                value={dateRange}
+                                onChange={setDateRange}
+                            />
                         </div>
                     </div>
 
@@ -53,6 +117,7 @@ export function SettersDashboard({ isSuperAdmin }: SettersDashboardProps) {
                     </div>
                     <div className="flex gap-3">
                         <button
+                            onClick={fetchMetrics}
                             disabled={loading}
                             className="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium shadow-sm hover:shadow-md transition-all flex items-center gap-2 text-slate-900 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
@@ -64,17 +129,37 @@ export function SettersDashboard({ isSuperAdmin }: SettersDashboardProps) {
                     </div>
                 </div>
 
-                <div className="glass-panel bg-white/70 text-center py-16 rounded-2xl">
-                    <div className="w-16 h-16 mx-auto mb-4 bg-primary/10 rounded-full flex items-center justify-center">
-                        <span className="material-symbols-outlined text-primary text-3xl">smart_toy</span>
+                {loading ? (
+                    <div className="flex items-center justify-center h-64">
+                        <div className="text-center">
+                            <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                            <p className="text-slate-500">Cargando métricas...</p>
+                        </div>
                     </div>
-                    <h3 className="text-xl font-semibold text-slate-900 mb-2">
-                        Próximamente
-                    </h3>
-                    <p className="text-slate-500 max-w-md mx-auto">
-                        Este panel está en construcción. Aquí verás las métricas específicas para los agentes de setters de FA Interiores.
-                    </p>
-                </div>
+                ) : metrics ? (
+                    <>
+                        <SettersMetricsGrid metrics={metrics} trends={trends} />
+
+                        {trendData.length > 0 && (
+                            <TrendChart
+                                data={trendData}
+                                title="Tendencia de Mensajes Salientes IA"
+                            />
+                        )}
+                    </>
+                ) : (
+                    <div className="glass-panel bg-white/70 text-center py-16 rounded-2xl">
+                        <svg className="w-16 h-16 mx-auto mb-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                        </svg>
+                        <h3 className="text-xl font-semibold text-slate-900 mb-2">
+                            No hay datos disponibles
+                        </h3>
+                        <p className="text-slate-500">
+                            No hay datos disponibles para el rango seleccionado.
+                        </p>
+                    </div>
+                )}
             </main>
         </div>
     );

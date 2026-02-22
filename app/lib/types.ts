@@ -44,6 +44,17 @@ export interface MetricsResponse {
         email_cart_abandoned?: number;
         email_buyer_x1?: number;
         email_buyer_recurring?: number;
+
+        // Setters IA
+        ai_message_sent?: number;
+        first_follow_up?: number;
+        second_follow_up?: number;
+        state_new_construction?: number;
+        state_construction_over_150?: number;
+        state_link_sent?: number;
+        state_scheduled_video_sent?: number;
+        state_scheduled_video_sent_under_150?: number;
+        state_scheduled_video_sent_remodel_over_150?: number;
     };
     trends?: Record<string, number>;
     trend?: Array<{

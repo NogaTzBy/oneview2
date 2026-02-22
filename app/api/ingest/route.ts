@@ -22,6 +22,17 @@ const VALID_EVENT_TYPES = [
     'email_cart_abandoned',
     'email_buyer_x1',
     'email_buyer_recurring',
+
+    // Setters IA Events
+    'ai_message_sent',
+    'first_follow_up',
+    'second_follow_up',
+    'state_new_construction',
+    'state_construction_over_150',
+    'state_link_sent',
+    'state_scheduled_video_sent',
+    'state_scheduled_video_sent_under_150',
+    'state_scheduled_video_sent_remodel_over_150'
 ];
 
 export async function POST(request: NextRequest) {

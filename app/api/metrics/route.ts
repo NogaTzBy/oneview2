@@ -66,6 +66,17 @@ export async function GET(request: NextRequest) {
             email_cart_abandoned: 0,
             email_buyer_x1: 0,
             email_buyer_recurring: 0,
+
+            // Setters IA Metrics
+            ai_message_sent: 0,
+            first_follow_up: 0,
+            second_follow_up: 0,
+            state_new_construction: 0,
+            state_construction_over_150: 0,
+            state_link_sent: 0,
+            state_scheduled_video_sent: 0,
+            state_scheduled_video_sent_under_150: 0,
+            state_scheduled_video_sent_remodel_over_150: 0,
         };
 
         const conversationSet = new Set<string>();
@@ -117,6 +128,33 @@ export async function GET(request: NextRequest) {
                 case 'email_buyer_recurring':
                     metrics.email_buyer_recurring++;
                     break;
+                case 'ai_message_sent':
+                    metrics.ai_message_sent++;
+                    break;
+                case 'first_follow_up':
+                    metrics.first_follow_up++;
+                    break;
+                case 'second_follow_up':
+                    metrics.second_follow_up++;
+                    break;
+                case 'state_new_construction':
+                    metrics.state_new_construction++;
+                    break;
+                case 'state_construction_over_150':
+                    metrics.state_construction_over_150++;
+                    break;
+                case 'state_link_sent':
+                    metrics.state_link_sent++;
+                    break;
+                case 'state_scheduled_video_sent':
+                    metrics.state_scheduled_video_sent++;
+                    break;
+                case 'state_scheduled_video_sent_under_150':
+                    metrics.state_scheduled_video_sent_under_150++;
+                    break;
+                case 'state_scheduled_video_sent_remodel_over_150':
+                    metrics.state_scheduled_video_sent_remodel_over_150++;
+                    break;
             }
         });
 
@@ -155,6 +193,17 @@ export async function GET(request: NextRequest) {
                     tracking_codes: 0,
                     template_opens: 0,
                     windows_24h: 0,
+
+                    // Setters IA
+                    ai_message_sent: 0,
+                    first_follow_up: 0,
+                    second_follow_up: 0,
+                    state_new_construction: 0,
+                    state_construction_over_150: 0,
+                    state_link_sent: 0,
+                    state_scheduled_video_sent: 0,
+                    state_scheduled_video_sent_under_150: 0,
+                    state_scheduled_video_sent_remodel_over_150: 0,
                 };
 
                 const yesterdayConvSet = new Set<string>();
@@ -194,6 +243,33 @@ export async function GET(request: NextRequest) {
                         case 'window_24h_opened':
                             yesterdayMetrics.windows_24h++;
                             break;
+                        case 'ai_message_sent':
+                            yesterdayMetrics.ai_message_sent++;
+                            break;
+                        case 'first_follow_up':
+                            yesterdayMetrics.first_follow_up++;
+                            break;
+                        case 'second_follow_up':
+                            yesterdayMetrics.second_follow_up++;
+                            break;
+                        case 'state_new_construction':
+                            yesterdayMetrics.state_new_construction++;
+                            break;
+                        case 'state_construction_over_150':
+                            yesterdayMetrics.state_construction_over_150++;
+                            break;
+                        case 'state_link_sent':
+                            yesterdayMetrics.state_link_sent++;
+                            break;
+                        case 'state_scheduled_video_sent':
+                            yesterdayMetrics.state_scheduled_video_sent++;
+                            break;
+                        case 'state_scheduled_video_sent_under_150':
+                            yesterdayMetrics.state_scheduled_video_sent_under_150++;
+                            break;
+                        case 'state_scheduled_video_sent_remodel_over_150':
+                            yesterdayMetrics.state_scheduled_video_sent_remodel_over_150++;
+                            break;
                     }
                 });
 
@@ -217,6 +293,17 @@ export async function GET(request: NextRequest) {
                 trends.ai_purchases_count = calculateTrend(metrics.ai_purchases_count, yesterdayMetrics.ai_purchases_count);
                 trends.template_opens = calculateTrend(metrics.template_opens, yesterdayMetrics.template_opens);
                 trends.windows_24h = calculateTrend(metrics.windows_24h, yesterdayMetrics.windows_24h);
+
+                // Setters IA Trends
+                trends.ai_message_sent = calculateTrend(metrics.ai_message_sent, yesterdayMetrics.ai_message_sent);
+                trends.first_follow_up = calculateTrend(metrics.first_follow_up, yesterdayMetrics.first_follow_up);
+                trends.second_follow_up = calculateTrend(metrics.second_follow_up, yesterdayMetrics.second_follow_up);
+                trends.state_new_construction = calculateTrend(metrics.state_new_construction, yesterdayMetrics.state_new_construction);
+                trends.state_construction_over_150 = calculateTrend(metrics.state_construction_over_150, yesterdayMetrics.state_construction_over_150);
+                trends.state_link_sent = calculateTrend(metrics.state_link_sent, yesterdayMetrics.state_link_sent);
+                trends.state_scheduled_video_sent = calculateTrend(metrics.state_scheduled_video_sent, yesterdayMetrics.state_scheduled_video_sent);
+                trends.state_scheduled_video_sent_under_150 = calculateTrend(metrics.state_scheduled_video_sent_under_150, yesterdayMetrics.state_scheduled_video_sent_under_150);
+                trends.state_scheduled_video_sent_remodel_over_150 = calculateTrend(metrics.state_scheduled_video_sent_remodel_over_150, yesterdayMetrics.state_scheduled_video_sent_remodel_over_150);
             }
         }
 
