@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { SettersMetricsGrid } from '../../components/SettersMetricsGrid';
 import { TrendChart } from '../../components/TrendChart';
+import { ConfigModal } from '../../components/ConfigModal';
 import { DateRange, MetricsResponse, Project } from '../../lib/types';
 import { useProject } from '../../context/ProjectContext';
 import { ProjectSelector } from '../../components/ProjectSelector';
@@ -23,6 +24,7 @@ export function SettersDashboard({ isSuperAdmin }: SettersDashboardProps) {
     const [dateRange, setDateRange] = useState<DateRange>({ from: '', to: '', label: 'Últimos 7 Días' });
     const [project, setProject] = useState<Project | null>(null);
     const [loading, setLoading] = useState(true);
+    const [configOpen, setConfigOpen] = useState(false);
     const router = useRouter();
 
     useEffect(() => {
@@ -101,6 +103,7 @@ export function SettersDashboard({ isSuperAdmin }: SettersDashboardProps) {
 
                     <div className="flex items-center gap-2">
                         <button
+                            onClick={() => setConfigOpen(true)}
                             className="p-2 rounded-full hover:bg-slate-100 text-slate-500 transition-colors"
                         >
                             <span className="material-symbols-outlined">settings</span>
@@ -165,6 +168,14 @@ export function SettersDashboard({ isSuperAdmin }: SettersDashboardProps) {
                     </div>
                 )}
             </main>
+
+            {/* Config Modal */}
+            <ConfigModal
+                isOpen={configOpen}
+                onClose={() => setConfigOpen(false)}
+                project={project}
+                onRefresh={() => { }} // No widgets or refresh logic needed for Setters at the moment compared to Ecommerce
+            />
         </div>
     );
 }
