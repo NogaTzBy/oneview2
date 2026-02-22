@@ -6,9 +6,10 @@ import { Project } from '../lib/types';
 interface ConfigTabIngestaProps {
     project: Project;
     onRefresh: () => void;
+    dashboardContext?: 'ecommerce' | 'setters';
 }
 
-const EVENT_TYPES = [
+const ECOMMERCE_EVENT_TYPES = [
     { key: 'conversation_started', label: 'Conversación Iniciada', icon: 'chat_bubble_outline' },
     { key: 'conversation_closed', label: 'Conversación Cerrada', icon: 'check_circle' },
     { key: 'human_escalation', label: 'Derivación a Humano', icon: 'person' },
@@ -24,7 +25,21 @@ const EVENT_TYPES = [
     { key: 'email_buyer_recurring', label: 'Email a Comprador Recurrente', icon: 'repeat' },
 ];
 
-export function ConfigTabIngesta({ project, onRefresh }: ConfigTabIngestaProps) {
+const SETTERS_EVENT_TYPES = [
+    { key: 'conversation_started', label: 'Conversación Iniciada', icon: 'chat_bubble_outline' },
+    { key: 'ai_message_sent', label: 'Mensaje Enviado por la IA', icon: 'smart_toy' },
+    { key: 'first_follow_up', label: 'Primer Seguimiento', icon: 'counter_1' },
+    { key: 'second_follow_up', label: 'Segundo Seguimiento', icon: 'counter_2' },
+    { key: 'state_new_construction', label: 'Estado: Obra desde cero', icon: 'home_work' },
+    { key: 'state_construction_over_150', label: 'Estado: Obra + planos > 150m²', icon: 'architecture' },
+    { key: 'state_link_sent', label: 'Estado: Link de agenda enviado', icon: 'link' },
+    { key: 'state_scheduled_video_sent', label: 'Estado: Agendó + video enviado', icon: 'smart_display' },
+    { key: 'state_scheduled_video_sent_under_150', label: 'Estado: Agendó + video < 150m²', icon: 'video_camera_front' },
+    { key: 'state_scheduled_video_sent_remodel_over_150', label: 'Estado: Agendó + video reforma > 150m²', icon: 'handyman' },
+];
+
+export function ConfigTabIngesta({ project, onRefresh, dashboardContext = 'ecommerce' }: ConfigTabIngestaProps) {
+    const EVENT_TYPES = dashboardContext === 'setters' ? SETTERS_EVENT_TYPES : ECOMMERCE_EVENT_TYPES;
     const [selectedEvent, setSelectedEvent] = useState(EVENT_TYPES[0]);
     const [showToken, setShowToken] = useState(false);
     const [copied, setCopied] = useState(false);
@@ -37,7 +52,9 @@ export function ConfigTabIngesta({ project, onRefresh }: ConfigTabIngestaProps) 
 
     const generateCurl = (eventType: string) => {
         const token = project.ingest_token || 'sk_live_...';
-        const examples: Record<string, any> = {
+
+        // E-commerce examples
+        const ecommerceExamples: Record<string, any> = {
             'conversation_started': {
                 event_type: 'conversation_started',
                 project_id: project.id,
@@ -134,6 +151,81 @@ export function ConfigTabIngesta({ project, onRefresh }: ConfigTabIngestaProps) 
             }
         };
 
+        // Setters examples
+        const settersExamples: Record<string, any> = {
+            'conversation_started': {
+                event_type: 'conversation_started',
+                project_id: project.id,
+                conversation_id: 'conv_12345',
+                channel: 'whatsapp',
+                created_at: new Date().toISOString()
+            },
+            'ai_message_sent': {
+                event_type: 'ai_message_sent',
+                project_id: project.id,
+                conversation_id: 'conv_12345',
+                channel: 'whatsapp',
+                created_at: new Date().toISOString()
+            },
+            'first_follow_up': {
+                event_type: 'first_follow_up',
+                project_id: project.id,
+                conversation_id: 'conv_12345',
+                channel: 'whatsapp',
+                created_at: new Date().toISOString()
+            },
+            'second_follow_up': {
+                event_type: 'second_follow_up',
+                project_id: project.id,
+                conversation_id: 'conv_12345',
+                channel: 'whatsapp',
+                created_at: new Date().toISOString()
+            },
+            'state_new_construction': {
+                event_type: 'state_new_construction',
+                project_id: project.id,
+                conversation_id: 'conv_12345',
+                channel: 'whatsapp',
+                created_at: new Date().toISOString()
+            },
+            'state_construction_over_150': {
+                event_type: 'state_construction_over_150',
+                project_id: project.id,
+                conversation_id: 'conv_12345',
+                channel: 'whatsapp',
+                created_at: new Date().toISOString()
+            },
+            'state_link_sent': {
+                event_type: 'state_link_sent',
+                project_id: project.id,
+                conversation_id: 'conv_12345',
+                channel: 'whatsapp',
+                created_at: new Date().toISOString()
+            },
+            'state_scheduled_video_sent': {
+                event_type: 'state_scheduled_video_sent',
+                project_id: project.id,
+                conversation_id: 'conv_12345',
+                channel: 'whatsapp',
+                created_at: new Date().toISOString()
+            },
+            'state_scheduled_video_sent_under_150': {
+                event_type: 'state_scheduled_video_sent_under_150',
+                project_id: project.id,
+                conversation_id: 'conv_12345',
+                channel: 'whatsapp',
+                created_at: new Date().toISOString()
+            },
+            'state_scheduled_video_sent_remodel_over_150': {
+                event_type: 'state_scheduled_video_sent_remodel_over_150',
+                project_id: project.id,
+                conversation_id: 'conv_12345',
+                channel: 'whatsapp',
+                created_at: new Date().toISOString()
+            },
+        };
+
+        const examples = dashboardContext === 'setters' ? settersExamples : ecommerceExamples;
         const payload = examples[eventType] || examples['conversation_started'];
 
         return `curl -X POST https://oneview2.vercel.app/api/ingest \\

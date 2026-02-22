@@ -11,11 +11,12 @@ interface ConfigModalProps {
     onClose: () => void;
     project: Project | null;
     onRefresh: () => void;
+    dashboardContext?: 'ecommerce' | 'setters';
 }
 
 type TabKey = 'general' | 'ingesta' | 'webhook';
 
-export function ConfigModal({ isOpen, onClose, project, onRefresh }: ConfigModalProps) {
+export function ConfigModal({ isOpen, onClose, project, onRefresh, dashboardContext = 'ecommerce' }: ConfigModalProps) {
     const [activeTab, setActiveTab] = useState<TabKey>('general');
 
     if (!isOpen || !project) return null;
@@ -72,7 +73,7 @@ export function ConfigModal({ isOpen, onClose, project, onRefresh }: ConfigModal
                         <ConfigTabGeneral project={project} onRefresh={onRefresh} />
                     )}
                     {activeTab === 'ingesta' && (
-                        <ConfigTabIngesta project={project} onRefresh={onRefresh} />
+                        <ConfigTabIngesta project={project} onRefresh={onRefresh} dashboardContext={dashboardContext} />
                     )}
                     {activeTab === 'webhook' && (
                         <ConfigTabWebhook project={project} onRefresh={onRefresh} />

@@ -174,7 +174,8 @@ export function SettersDashboard({ isSuperAdmin }: SettersDashboardProps) {
                 isOpen={configOpen}
                 onClose={() => setConfigOpen(false)}
                 project={project}
-                onRefresh={() => { }} // No widgets or refresh logic needed for Setters at the moment compared to Ecommerce
+                onRefresh={() => { }}
+                dashboardContext="setters"
             />
         </div>
     );
