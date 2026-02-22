@@ -145,6 +145,9 @@ export function SettersDashboard({ isSuperAdmin }: SettersDashboardProps) {
                             <TrendChart
                                 data={trendData}
                                 title="Tendencia de Mensajes Salientes IA"
+                                subtitle="Mensajes enviados en los últimos 7 días"
+                                totalLabel="Mensajes Totales"
+                                isCurrency={false}
                             />
                         )}
                     </>

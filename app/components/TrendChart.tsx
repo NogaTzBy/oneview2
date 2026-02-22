@@ -8,6 +8,9 @@ interface TrendChartProps {
         value: number;
     }[];
     title: string;
+    subtitle?: string;
+    totalLabel?: string;
+    isCurrency?: boolean;
 }
 
 const CustomTooltip = ({ active, payload, label }: any) => {
@@ -24,19 +27,34 @@ const CustomTooltip = ({ active, payload, label }: any) => {
     return null;
 };
 
-export function TrendChart({ data, title }: TrendChartProps) {
+export function TrendChart({
+    data,
+    title,
+    subtitle = "Ingresos generados en los últimos 7 días",
+    totalLabel = "Ingresos Totales",
+    isCurrency = true
+}: TrendChartProps) {
+    const totalValue = data.reduce((sum, item) => sum + item.value, 0);
+
+    const formatValue = (val: number) => {
+        if (isCurrency) {
+            return `$${(val / 1000).toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}k`;
+        }
+        return val.toLocaleString('es-AR');
+    };
+
     return (
         <div className="glass-panel bg-white rounded-3xl p-8 shadow-soft border border-slate-200 relative overflow-hidden">
             <div className="flex justify-between items-center mb-8">
                 <div>
                     <h3 className="text-xl font-bold text-slate-900">{title}</h3>
-                    <p className="text-sm text-slate-500 mt-1">Ingresos generados en los últimos 7 días</p>
+                    <p className="text-sm text-slate-500 mt-1">{subtitle}</p>
                 </div>
                 <div className="text-right">
                     <span className="block text-3xl font-bold text-primary">
-                        ${(data.reduce((sum, item) => sum + item.value, 0) / 1000).toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}k
+                        {formatValue(totalValue)}
                     </span>
-                    <span className="text-sm text-slate-400">Ingresos Totales</span>
+                    <span className="text-sm text-slate-400">{totalLabel}</span>
                 </div>
             </div>
 
