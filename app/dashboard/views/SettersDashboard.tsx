@@ -225,9 +225,9 @@ export function SettersDashboard({ isSuperAdmin }: SettersDashboardProps) {
                                 </h3>
                             </div>
                             <p className="text-slate-600 mb-6">
-                                Se descargará un archivo CSV con todas las métricas de Setters del período{' '}
+                                Se descargará un archivo CSV con todas las métricas de Setters para:{' '}
                                 <span className="font-medium text-slate-900">
-                                    {new Date(dateRange.from).toLocaleDateString()} - {new Date(dateRange.to).toLocaleDateString()}
+                                    {dateRange.label}
                                 </span>
                             </p>
                             <div className="flex gap-3">
