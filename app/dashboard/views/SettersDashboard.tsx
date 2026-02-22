@@ -25,7 +25,41 @@ export function SettersDashboard({ isSuperAdmin }: SettersDashboardProps) {
     const [project, setProject] = useState<Project | null>(null);
     const [loading, setLoading] = useState(true);
     const [configOpen, setConfigOpen] = useState(false);
+    const [showExportConfirm, setShowExportConfirm] = useState(false);
     const router = useRouter();
+
+    const exportToCSV = () => {
+        if (!metrics) return;
+
+        const csvRows = [
+            ['Métrica', 'Valor', 'Fecha de Exportación'],
+            ['Mensajes de la IA', metrics.ai_message_sent?.toString() || '0', new Date().toLocaleDateString()],
+            ['Nuevo Lead', metrics.conversations_started?.toString() || '0', new Date().toLocaleDateString()],
+            ['Conversaciones Cerradas', metrics.conversations_closed?.toString() || '0', new Date().toLocaleDateString()],
+            ['Primeros Seguimientos', metrics.first_follow_up?.toString() || '0', new Date().toLocaleDateString()],
+            ['Segundos Seguimientos', metrics.second_follow_up?.toString() || '0', new Date().toLocaleDateString()],
+            ['Estado: Obra desde cero', metrics.state_new_construction?.toString() || '0', new Date().toLocaleDateString()],
+            ['Estado: Obra + planos > 150m²', metrics.state_construction_over_150?.toString() || '0', new Date().toLocaleDateString()],
+            ['Estado: Link de agenda enviado', metrics.state_link_sent?.toString() || '0', new Date().toLocaleDateString()],
+            ['Estado: Agendó + video enviado', metrics.state_scheduled_video_sent?.toString() || '0', new Date().toLocaleDateString()],
+            ['Estado: Agendó + video < 150m²', metrics.state_scheduled_video_sent_under_150?.toString() || '0', new Date().toLocaleDateString()],
+            ['Estado: Agendó + video reforma > 150m²', metrics.state_scheduled_video_sent_remodel_over_150?.toString() || '0', new Date().toLocaleDateString()],
+        ];
+
+        const csvContent = csvRows
+            .map(row => row.map(cell => `"${cell}"`).join(','))
+            .join('\n');
+
+        const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.setAttribute('href', URL.createObjectURL(blob));
+        link.setAttribute('download', `setters-metricas-${dateRange.from}-${dateRange.to}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        setShowExportConfirm(false);
+    };
 
     useEffect(() => {
         const now = new Date();
@@ -130,6 +164,14 @@ export function SettersDashboard({ isSuperAdmin }: SettersDashboardProps) {
                             </span>
                             Actualizar
                         </button>
+                        <button
+                            onClick={() => setShowExportConfirm(true)}
+                            disabled={!metrics || loading}
+                            className="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium shadow-sm hover:shadow-md transition-all flex items-center gap-2 text-slate-900 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            <span className="material-symbols-outlined text-[18px]">download</span>
+                            Exportar
+                        </button>
                     </div>
                 </div>
 
@@ -168,6 +210,45 @@ export function SettersDashboard({ isSuperAdmin }: SettersDashboardProps) {
                     </div>
                 )}
             </main>
+
+            {/* Export Confirmation Modal */}
+            {showExportConfirm && (
+                <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-2xl shadow-xl max-w-md w-full border border-slate-200">
+                        <div className="p-6">
+                            <div className="flex items-center gap-3 mb-4">
+                                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                                    <span className="material-symbols-outlined text-primary text-2xl">download</span>
+                                </div>
+                                <h3 className="text-lg font-semibold text-slate-900">
+                                    ¿Descargar métricas?
+                                </h3>
+                            </div>
+                            <p className="text-slate-600 mb-6">
+                                Se descargará un archivo CSV con todas las métricas de Setters del período{' '}
+                                <span className="font-medium text-slate-900">
+                                    {new Date(dateRange.from).toLocaleDateString()} - {new Date(dateRange.to).toLocaleDateString()}
+                                </span>
+                            </p>
+                            <div className="flex gap-3">
+                                <button
+                                    onClick={() => setShowExportConfirm(false)}
+                                    className="flex-1 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-medium transition-colors"
+                                >
+                                    Cancelar
+                                </button>
+                                <button
+                                    onClick={exportToCSV}
+                                    className="flex-1 px-4 py-2.5 bg-primary hover:bg-primary-dark text-white rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
+                                >
+                                    <span className="material-symbols-outlined text-[18px]">download</span>
+                                    Descargar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Config Modal */}
             <ConfigModal
