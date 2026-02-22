@@ -18,7 +18,7 @@ export function SettersMetricsGrid({ metrics, trends = {} }: SettersMetricsGridP
         },
         {
             key: 'conversations_started',
-            title: 'Conversaciones Iniciadas',
+            title: 'Nuevo Lead',
             icon: 'chat_bubble_outline',
             value: metrics.conversations_started || 0,
             trend: trends.conversations_started,
