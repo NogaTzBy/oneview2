@@ -160,10 +160,10 @@ export async function GET(request: NextRequest) {
             }
         });
 
-        // Calculate closure rate
-        if (conversationSet.size > 0) {
+        // Calculate closure rate based on AI purchases and conversations started
+        if (metrics.conversations_started > 0) {
             metrics.closure_rate = Math.round(
-                (closedConversations.size / conversationSet.size) * 100
+                (metrics.ai_purchases_count / metrics.conversations_started) * 100
             );
         }
 
@@ -275,9 +275,9 @@ export async function GET(request: NextRequest) {
                     }
                 });
 
-                if (yesterdayConvSet.size > 0) {
+                if (yesterdayMetrics.conversations_started > 0) {
                     yesterdayMetrics.closure_rate = Math.round(
-                        (yesterdayClosedSet.size / yesterdayConvSet.size) * 100
+                        (yesterdayMetrics.ai_purchases_count / yesterdayMetrics.conversations_started) * 100
                     );
                 }
 

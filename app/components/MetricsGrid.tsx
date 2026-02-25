@@ -17,13 +17,7 @@ export function MetricsGrid({ metrics, widgets, trends = {} }: MetricsGridProps)
             value: metrics.conversations_started || 0,
             trend: trends.conversations_started,
         },
-        {
-            key: 'conversations_closed',
-            title: 'Conversaciones Cerradas',
-            icon: 'check_circle_outline',
-            value: metrics.conversations_closed || 0,
-            trend: trends.conversations_closed,
-        },
+
         {
             key: 'closure_rate',
             title: 'Tasa de Cierre',
@@ -48,7 +42,7 @@ export function MetricsGrid({ metrics, widgets, trends = {} }: MetricsGridProps)
         },
         {
             key: 'complaints',
-            title: 'Reclamos Abiertos',
+            title: 'Reclamos',
             icon: 'warning_amber',
             value: metrics.complaints || 0,
             trend: trends.complaints,
