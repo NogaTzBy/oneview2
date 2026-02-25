@@ -8,6 +8,8 @@ interface Project {
     name: string;
     ingest_token: string;
     timezone: string;
+    target_currency?: string;
+    exchange_rate?: number;
     created_at: string;
 }
 

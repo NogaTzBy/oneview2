@@ -13,20 +13,26 @@ export function DateRangePicker({ value, onChange }: DateRangePickerProps) {
     const [customFrom, setCustomFrom] = useState('');
     const [customTo, setCustomTo] = useState('');
 
+    const getLocalDateString = (d: Date = new Date()) => {
+        const date = new Date(d);
+        date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
+        return date.toISOString().split('T')[0];
+    };
+
     const presets: DateRange[] = [
         {
-            from: new Date().toISOString().split('T')[0],
-            to: new Date().toISOString().split('T')[0],
+            from: getLocalDateString(),
+            to: getLocalDateString(),
             label: 'Hoy',
         },
         {
-            from: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-            to: new Date().toISOString().split('T')[0],
+            from: getLocalDateString(new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)),
+            to: getLocalDateString(),
             label: 'Últimos 7 días',
         },
         {
-            from: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0],
-            to: new Date().toISOString().split('T')[0],
+            from: getLocalDateString(new Date(new Date().getFullYear(), new Date().getMonth(), 1)),
+            to: getLocalDateString(),
             label: 'Este mes',
         },
     ];

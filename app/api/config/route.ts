@@ -51,6 +51,8 @@ export async function GET(request: NextRequest) {
                 ingest_token: project.ingest_token,
                 webhook_url: project.webhook_url,
                 webhook_interval: project.webhook_interval,
+                target_currency: project.target_currency,
+                exchange_rate: project.exchange_rate,
             },
             widgets: widgets || [],
         });
@@ -67,7 +69,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
-        const { project_id, name, timezone, webhook_url, webhook_interval, widgets } = body;
+        const { project_id, name, timezone, webhook_url, webhook_interval, target_currency, exchange_rate, widgets } = body;
 
         if (!project_id) {
             return NextResponse.json(
@@ -82,6 +84,8 @@ export async function POST(request: NextRequest) {
         if (timezone !== undefined) updates.timezone = timezone;
         if (webhook_url !== undefined) updates.webhook_url = webhook_url;
         if (webhook_interval !== undefined) updates.webhook_interval = webhook_interval;
+        if (target_currency !== undefined) updates.target_currency = target_currency;
+        if (exchange_rate !== undefined) updates.exchange_rate = exchange_rate;
 
         if (Object.keys(updates).length > 0) {
             const { error: updateError } = await supabase

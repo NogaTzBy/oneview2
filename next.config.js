@@ -2,9 +2,7 @@
 const nextConfig = {
   reactStrictMode: true,
   output: 'standalone',
-  experimental: {
-    serverActions: true,
-  },
+  experimental: {},
   env: {
     CUSTOM_KEY: process.env.CUSTOM_KEY,
   },

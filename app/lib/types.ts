@@ -20,6 +20,8 @@ export interface Project {
     ingest_token: string;
     webhook_url?: string;
     webhook_interval?: number;
+    target_currency?: string;
+    exchange_rate?: number;
 }
 
 export interface Widget {

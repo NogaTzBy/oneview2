@@ -11,6 +11,7 @@ interface TrendChartProps {
     subtitle?: string;
     totalLabel?: string;
     isCurrency?: boolean;
+    currencySymbol?: string;
 }
 
 const CustomTooltip = ({ active, payload, label }: any) => {
@@ -32,13 +33,14 @@ export function TrendChart({
     title,
     subtitle = "Ingresos generados en los últimos 7 días",
     totalLabel = "Ingresos Totales",
-    isCurrency = true
+    isCurrency = true,
+    currencySymbol = "$"
 }: TrendChartProps) {
     const totalValue = data.reduce((sum, item) => sum + item.value, 0);
 
     const formatValue = (val: number) => {
         if (isCurrency) {
-            return `$${(val / 1000).toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}k`;
+            return `${currencySymbol}${(val / 1000).toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}k`;
         }
         return val.toLocaleString('es-AR');
     };

@@ -35,13 +35,19 @@ export function EcommerceDashboard({ isSuperAdmin }: EcommerceDashboardProps) {
     const supabase = createClient();
 
     useEffect(() => {
+        const getLocalDateString = (d: Date = new Date()) => {
+            const date = new Date(d);
+            date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
+            return date.toISOString().split('T')[0];
+        };
+
         const now = new Date();
         const sevenDaysAgo = new Date(now);
         sevenDaysAgo.setDate(now.getDate() - 7);
 
         setDateRange({
-            from: sevenDaysAgo.toISOString().split('T')[0],
-            to: now.toISOString().split('T')[0],
+            from: getLocalDateString(sevenDaysAgo),
+            to: getLocalDateString(now),
             label: 'Últimos 7 Días',
         });
     }, []);
@@ -75,9 +81,18 @@ export function EcommerceDashboard({ isSuperAdmin }: EcommerceDashboardProps) {
 
             if (response.ok) {
                 const data: MetricsResponse = await response.json();
+                let finalTrendData = data.trend || [];
+
+                if (selectedProject?.target_currency === 'USD' && selectedProject?.exchange_rate) {
+                    finalTrendData = finalTrendData.map(item => ({
+                        ...item,
+                        value: item.value / selectedProject.exchange_rate!
+                    }));
+                }
+
                 setMetrics(data.summary);
                 setTrends(data.trends || {});
-                setTrendData(data.trend || []);
+                setTrendData(finalTrendData);
             }
         } catch (error) {
             console.error('Error fetching metrics:', error);
@@ -262,6 +277,7 @@ export function EcommerceDashboard({ isSuperAdmin }: EcommerceDashboardProps) {
                             <TrendChart
                                 data={trendData}
                                 title="Tendencia de Compras por IA"
+                                currencySymbol={project?.target_currency === 'USD' ? 'US$' : '$'}
                             />
                         )}
 

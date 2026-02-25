@@ -26,19 +26,25 @@ const TIMEZONES = [
 export function ConfigTabGeneral({ project, onRefresh }: ConfigTabGeneralProps) {
     const [name, setName] = useState(project.name);
     const [timezone, setTimezone] = useState(project.timezone);
+    const [targetCurrency, setTargetCurrency] = useState(project.target_currency || 'UYU');
+    const [exchangeRate, setExchangeRate] = useState(project.exchange_rate || 42.0);
     const [saving, setSaving] = useState(false);
     const [hasChanges, setHasChanges] = useState(false);
 
     useEffect(() => {
         setName(project.name);
         setTimezone(project.timezone);
+        setTargetCurrency(project.target_currency || 'UYU');
+        setExchangeRate(project.exchange_rate || 42.0);
     }, [project]);
 
     useEffect(() => {
         const nameChanged = name !== project.name;
         const tzChanged = timezone !== project.timezone;
-        setHasChanges(nameChanged || tzChanged);
-    }, [name, timezone, project]);
+        const currencyChanged = targetCurrency !== (project.target_currency || 'UYU');
+        const rateChanged = exchangeRate !== (project.exchange_rate || 42.0);
+        setHasChanges(nameChanged || tzChanged || currencyChanged || rateChanged);
+    }, [name, timezone, targetCurrency, exchangeRate, project]);
 
     const handleSave = async () => {
         try {
@@ -50,6 +56,8 @@ export function ConfigTabGeneral({ project, onRefresh }: ConfigTabGeneralProps) 
                     project_id: project.id,
                     name,
                     timezone,
+                    target_currency: targetCurrency,
+                    exchange_rate: exchangeRate,
                 }),
             });
 
@@ -124,6 +132,48 @@ export function ConfigTabGeneral({ project, onRefresh }: ConfigTabGeneralProps) 
                     <span className="material-symbols-outlined text-xs">info</span>
                     La zona horaria afecta el cálculo de "Hoy" y "Este mes".
                 </p>
+            </div>
+
+            {/* Currency Select */}
+            <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-3">
+                            Moneda a Mostrar
+                        </label>
+                        <select
+                            value={targetCurrency}
+                            onChange={(e) => setTargetCurrency(e.target.value)}
+                            className="w-full px-4 py-3 bg-white border border-slate-200 rounded-lg text-slate-900 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all cursor-pointer"
+                        >
+                            <option value="UYU">Pesos Uruguayos (UYU)</option>
+                            <option value="USD">Dólares (USD)</option>
+                        </select>
+                        <p className="text-xs text-slate-400 mt-3 flex items-center gap-1">
+                            <span className="material-symbols-outlined text-xs">info</span>
+                            Solo aplica visualmente.
+                        </p>
+                    </div>
+                    {targetCurrency === 'USD' && (
+                        <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-3">
+                                Tipo de Cambio (UYU → USD)
+                            </label>
+                            <input
+                                type="number"
+                                step="any"
+                                value={exchangeRate}
+                                onChange={(e) => setExchangeRate(parseFloat(e.target.value) || 0)}
+                                className="w-full px-4 py-3 bg-white border border-slate-200 rounded-lg text-slate-900 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                                placeholder="Ej: 42.5"
+                            />
+                            <p className="text-xs text-slate-400 mt-3 flex items-center gap-1">
+                                <span className="material-symbols-outlined text-xs">info</span>
+                                Tasa usada para dividir los ingresos (Ej: Ingreso / 42.5).
+                            </p>
+                        </div>
+                    )}
+                </div>
             </div>
 
             {/* Save Button */}

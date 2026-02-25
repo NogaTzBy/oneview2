@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
         // Fetch all projects (RLS will handle access control)
         const { data: projects, error } = await supabase
             .from('projects')
-            .select('id, name, ingest_token, timezone, created_at')
+            .select('id, name, ingest_token, timezone, created_at, target_currency, exchange_rate')
             .order('created_at', { ascending: true });
 
         if (error) {
