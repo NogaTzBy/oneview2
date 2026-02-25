@@ -42,9 +42,8 @@ export function ConfigTabGeneral({ project, onRefresh }: ConfigTabGeneralProps) 
         const nameChanged = name !== project.name;
         const tzChanged = timezone !== project.timezone;
         const currencyChanged = targetCurrency !== (project.target_currency || 'UYU');
-        const rateChanged = exchangeRate !== (project.exchange_rate || 42.0);
-        setHasChanges(nameChanged || tzChanged || currencyChanged || rateChanged);
-    }, [name, timezone, targetCurrency, exchangeRate, project]);
+        setHasChanges(nameChanged || tzChanged || currencyChanged);
+    }, [name, timezone, targetCurrency, project]);
 
     const handleSave = async () => {
         try {
@@ -57,7 +56,6 @@ export function ConfigTabGeneral({ project, onRefresh }: ConfigTabGeneralProps) 
                     name,
                     timezone,
                     target_currency: targetCurrency,
-                    exchange_rate: exchangeRate,
                 }),
             });
 
@@ -159,17 +157,13 @@ export function ConfigTabGeneral({ project, onRefresh }: ConfigTabGeneralProps) 
                             <label className="block text-sm font-medium text-slate-700 mb-3">
                                 Tipo de Cambio (UYU → USD)
                             </label>
-                            <input
-                                type="number"
-                                step="any"
-                                value={exchangeRate}
-                                onChange={(e) => setExchangeRate(parseFloat(e.target.value) || 0)}
-                                className="w-full px-4 py-3 bg-white border border-slate-200 rounded-lg text-slate-900 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
-                                placeholder="Ej: 42.5"
-                            />
+                            <div className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg text-slate-700 flex items-center gap-2">
+                                <span className="material-symbols-outlined text-green-500 text-[18px]">sync</span>
+                                Automático en tiempo real
+                            </div>
                             <p className="text-xs text-slate-400 mt-3 flex items-center gap-1">
                                 <span className="material-symbols-outlined text-xs">info</span>
-                                Tasa usada para dividir los ingresos (Ej: Ingreso / 42.5).
+                                Se consultará el tipo de cambio oficial diariamente.
                             </p>
                         </div>
                     )}

@@ -83,10 +83,24 @@ export function EcommerceDashboard({ isSuperAdmin }: EcommerceDashboardProps) {
                 const data: MetricsResponse = await response.json();
                 let finalTrendData = data.trend || [];
 
-                if (selectedProject?.target_currency === 'USD' && selectedProject?.exchange_rate) {
+                if (selectedProject?.target_currency === 'USD') {
+                    // Fetch real-time exchange rate
+                    let liveExchangeRate = selectedProject.exchange_rate || 40.0; // Fallback
+                    try {
+                        const erResponse = await fetch('https://open.er-api.com/v6/latest/USD');
+                        if (erResponse.ok) {
+                            const erData = await erResponse.json();
+                            if (erData.rates && erData.rates.UYU) {
+                                liveExchangeRate = erData.rates.UYU;
+                            }
+                        }
+                    } catch (e) {
+                        console.error('Error fetching live exchange rate:', e);
+                    }
+
                     finalTrendData = finalTrendData.map(item => ({
                         ...item,
-                        value: item.value / selectedProject.exchange_rate!
+                        value: item.value / liveExchangeRate
                     }));
                 }
 
