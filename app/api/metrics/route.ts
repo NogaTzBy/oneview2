@@ -83,6 +83,7 @@ export async function GET(request: NextRequest) {
             state_scheduled_video_sent: 0,
             state_scheduled_video_sent_under_150: 0,
             state_scheduled_video_sent_remodel_over_150: 0,
+            instagram_follower: 0,
         };
 
         const conversationSet = new Set<string>();
@@ -161,6 +162,9 @@ export async function GET(request: NextRequest) {
                 case 'state_scheduled_video_sent_remodel_over_150':
                     metrics.state_scheduled_video_sent_remodel_over_150++;
                     break;
+                case 'instagram_follower':
+                    metrics.instagram_follower++;
+                    break;
             }
         });
 
@@ -211,6 +215,7 @@ export async function GET(request: NextRequest) {
                     state_scheduled_video_sent: 0,
                     state_scheduled_video_sent_under_150: 0,
                     state_scheduled_video_sent_remodel_over_150: 0,
+                    instagram_follower: 0,
                 };
 
                 const yesterdayConvSet = new Set<string>();
@@ -277,6 +282,9 @@ export async function GET(request: NextRequest) {
                         case 'state_scheduled_video_sent_remodel_over_150':
                             yesterdayMetrics.state_scheduled_video_sent_remodel_over_150++;
                             break;
+                        case 'instagram_follower':
+                            yesterdayMetrics.instagram_follower++;
+                            break;
                     }
                 });
 
@@ -311,6 +319,7 @@ export async function GET(request: NextRequest) {
                 trends.state_scheduled_video_sent = calculateTrend(metrics.state_scheduled_video_sent, yesterdayMetrics.state_scheduled_video_sent);
                 trends.state_scheduled_video_sent_under_150 = calculateTrend(metrics.state_scheduled_video_sent_under_150, yesterdayMetrics.state_scheduled_video_sent_under_150);
                 trends.state_scheduled_video_sent_remodel_over_150 = calculateTrend(metrics.state_scheduled_video_sent_remodel_over_150, yesterdayMetrics.state_scheduled_video_sent_remodel_over_150);
+                trends.instagram_follower = calculateTrend(metrics.instagram_follower, yesterdayMetrics.instagram_follower);
             }
         }
 

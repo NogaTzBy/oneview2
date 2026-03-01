@@ -32,7 +32,8 @@ const VALID_EVENT_TYPES = [
     'state_link_sent',
     'state_scheduled_video_sent',
     'state_scheduled_video_sent_under_150',
-    'state_scheduled_video_sent_remodel_over_150'
+    'state_scheduled_video_sent_remodel_over_150',
+    'instagram_follower'
 ];
 
 export async function POST(request: NextRequest) {
@@ -89,20 +90,35 @@ export async function POST(request: NextRequest) {
                 .limit(1);
 
             if (!recentError && recentEvents && recentEvents.length > 0) {
-                const latestEventTime = new Date(recentEvents[0].created_at).getTime();
-                const now = Date.now();
-                // We use Math.abs to protect against future timestamps generated incorrectly in the source
-                const diffSeconds = Math.abs(now - latestEventTime) / 1000;
+                const latestEventDate = new Date(recentEvents[0].created_at);
+                const now = new Date();
 
-                // If the last inserted event was less than 60 seconds ago in real time
-                if (diffSeconds < 60) {
-                    console.log(`[Rate Limit] Ignored duplicate event: ${event_type} for conversation ${conversation_id}. Time diff was ${diffSeconds}s.`);
-                    // Return success so n8n thinks it worked and doesn't retry
-                    return NextResponse.json({
-                        success: true,
-                        message: 'Event ignored (duplicate within last minute)',
-                        event_id: recentEvents[0].id,
-                    });
+                // Para ai_message_sent, limitamos a 1 vez por día por conversación
+                if (event_type === 'ai_message_sent') {
+                    // Convertir ambas fechas a zona horaria local (UTC-3)
+                    const latestLocal = new Date(latestEventDate.getTime() - 3 * 60 * 60 * 1000);
+                    const nowLocal = new Date(now.getTime() - 3 * 60 * 60 * 1000);
+
+                    const isSameDay = latestLocal.toISOString().split('T')[0] === nowLocal.toISOString().split('T')[0];
+                    if (isSameDay) {
+                        console.log(`[Rate Limit] Ignored duplicate daily event: ${event_type} for conversation ${conversation_id}.`);
+                        return NextResponse.json({
+                            success: true,
+                            message: 'Event ignored (already registered today)',
+                            event_id: recentEvents[0].id,
+                        });
+                    }
+                } else {
+                    // Para el resto de los eventos, el límite es 1 minuto (60 segundos)
+                    const diffSeconds = Math.abs(now.getTime() - latestEventDate.getTime()) / 1000;
+                    if (diffSeconds < 60) {
+                        console.log(`[Rate Limit] Ignored duplicate event: ${event_type} for conversation ${conversation_id}. Time diff was ${diffSeconds}s.`);
+                        return NextResponse.json({
+                            success: true,
+                            message: 'Event ignored (duplicate within last minute)',
+                            event_id: recentEvents[0].id,
+                        });
+                    }
                 }
             }
         }

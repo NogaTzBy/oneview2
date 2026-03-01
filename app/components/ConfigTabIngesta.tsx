@@ -28,7 +28,7 @@ const ECOMMERCE_EVENT_TYPES = [
 const SETTERS_EVENT_TYPES = [
     { key: 'conversation_started', label: 'Conversación Iniciada', icon: 'chat_bubble_outline' },
     { key: 'conversation_closed', label: 'Conversación Cerrada', icon: 'mark_chat_read' },
-    { key: 'ai_message_sent', label: 'Mensaje Enviado por la IA', icon: 'smart_toy' },
+    { key: 'ai_message_sent', label: 'Conversaciones Únicas (Hoy)', icon: 'chat' },
     { key: 'first_follow_up', label: 'Primer Seguimiento', icon: 'counter_1' },
     { key: 'second_follow_up', label: 'Segundo Seguimiento', icon: 'counter_2' },
     { key: 'state_new_construction', label: 'Estado: Obra desde cero', icon: 'home_work' },
@@ -37,6 +37,7 @@ const SETTERS_EVENT_TYPES = [
     { key: 'state_scheduled_video_sent', label: 'Estado: Agendó + video enviado', icon: 'smart_display' },
     { key: 'state_scheduled_video_sent_under_150', label: 'Estado: Agendó + video < 150m²', icon: 'video_camera_front' },
     { key: 'state_scheduled_video_sent_remodel_over_150', label: 'Estado: Agendó + video reforma > 150m²', icon: 'handyman' },
+    { key: 'instagram_follower', label: 'Nuevos Seguidores', icon: 'group_add' },
 ];
 
 export function ConfigTabIngesta({ project, onRefresh, dashboardContext = 'ecommerce' }: ConfigTabIngestaProps) {
@@ -229,6 +230,13 @@ export function ConfigTabIngesta({ project, onRefresh, dashboardContext = 'ecomm
                 project_id: project.id,
                 conversation_id: 'conv_12345',
                 channel: 'whatsapp',
+                created_at: new Date().toISOString()
+            },
+            'instagram_follower': {
+                event_type: 'instagram_follower',
+                project_id: project.id,
+                conversation_id: 'conv_12345',
+                channel: 'instagram',
                 created_at: new Date().toISOString()
             },
         };

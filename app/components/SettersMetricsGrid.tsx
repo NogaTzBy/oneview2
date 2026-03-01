@@ -10,7 +10,7 @@ export function SettersMetricsGrid({ metrics, trends = {} }: SettersMetricsGridP
     const mainCards = [
         {
             key: 'ai_message_sent',
-            title: 'Mensajes de la IA',
+            title: 'Conversaciones Únicas',
             icon: 'chat',
             value: metrics.ai_message_sent || 0,
             trend: trends.ai_message_sent,
@@ -43,6 +43,13 @@ export function SettersMetricsGrid({ metrics, trends = {} }: SettersMetricsGridP
             icon: 'looks_two',
             value: metrics.second_follow_up || 0,
             trend: trends.second_follow_up,
+        },
+        {
+            key: 'instagram_follower',
+            title: 'Nuevos Seguidores',
+            icon: 'group_add',
+            value: metrics.instagram_follower || 0,
+            trend: trends.instagram_follower,
         },
     ];
 

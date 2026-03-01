@@ -33,11 +33,12 @@ export function SettersDashboard({ isSuperAdmin }: SettersDashboardProps) {
 
         const csvRows = [
             ['Métrica', 'Valor', 'Fecha de Exportación'],
-            ['Mensajes de la IA', metrics.ai_message_sent?.toString() || '0', new Date().toLocaleDateString()],
+            ['Conversaciones Únicas (Hoy)', metrics.ai_message_sent?.toString() || '0', new Date().toLocaleDateString()],
             ['Nuevo Lead', metrics.conversations_started?.toString() || '0', new Date().toLocaleDateString()],
             ['Conversaciones Cerradas', metrics.conversations_closed?.toString() || '0', new Date().toLocaleDateString()],
             ['Primeros Seguimientos', metrics.first_follow_up?.toString() || '0', new Date().toLocaleDateString()],
             ['Segundos Seguimientos', metrics.second_follow_up?.toString() || '0', new Date().toLocaleDateString()],
+            ['Nuevos Seguidores', metrics.instagram_follower?.toString() || '0', new Date().toLocaleDateString()],
             ['Estado: Obra desde cero', metrics.state_new_construction?.toString() || '0', new Date().toLocaleDateString()],
             ['Estado: Obra + planos > 150m²', metrics.state_construction_over_150?.toString() || '0', new Date().toLocaleDateString()],
             ['Estado: Link de agenda enviado', metrics.state_link_sent?.toString() || '0', new Date().toLocaleDateString()],
