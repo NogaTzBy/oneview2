@@ -31,9 +31,9 @@ export function DateRangePicker({ value, onChange }: DateRangePickerProps) {
             label: 'Últimos 7 días',
         },
         {
-            from: getLocalDateString(new Date(new Date().getFullYear(), new Date().getMonth(), 1)),
+            from: getLocalDateString(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)),
             to: getLocalDateString(),
-            label: 'Este mes',
+            label: 'Últimos 30 días',
         },
     ];
 
