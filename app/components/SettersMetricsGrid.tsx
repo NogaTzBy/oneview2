@@ -44,17 +44,18 @@ export function SettersMetricsGrid({ metrics, trends = {} }: SettersMetricsGridP
             value: metrics.second_follow_up || 0,
             trend: trends.second_follow_up,
         },
+    ];
+
+    // Segunda grilla: Estados de Clientes (4 columnas = 2 filas de 4)
+    const statesCards = [
         {
             key: 'instagram_follower',
             title: 'Nuevos Seguidores',
             icon: 'group_add',
             value: metrics.instagram_follower || 0,
             trend: trends.instagram_follower,
+            highlighted: false
         },
-    ];
-
-    // Segunda grilla: Estados de Clientes
-    const statesCards = [
         {
             key: 'state_new_construction',
             title: 'Obra desde cero',
@@ -141,7 +142,7 @@ export function SettersMetricsGrid({ metrics, trends = {} }: SettersMetricsGridP
                     <span className="material-symbols-outlined text-emerald-600">group_work</span>
                     Estados de Clientes
                 </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                     {statesCards.map((card) => (
                         <MetricCard
                             key={card.key}
