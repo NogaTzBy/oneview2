@@ -28,7 +28,7 @@ const ECOMMERCE_EVENT_TYPES = [
 const SETTERS_EVENT_TYPES = [
     { key: 'conversation_started', label: 'Conversación Iniciada', icon: 'chat_bubble_outline' },
     { key: 'conversation_closed', label: 'Conversación Cerrada', icon: 'mark_chat_read' },
-    { key: 'ai_message_sent', label: 'Conversaciones Únicas (Hoy)', icon: 'chat' },
+    { key: 'ai_message_sent', label: 'Contactos del Día', icon: 'chat' },
     { key: 'first_follow_up', label: 'Primer Seguimiento', icon: 'counter_1' },
     { key: 'second_follow_up', label: 'Segundo Seguimiento', icon: 'counter_2' },
     { key: 'state_new_construction', label: 'Estado: Obra desde cero', icon: 'home_work' },

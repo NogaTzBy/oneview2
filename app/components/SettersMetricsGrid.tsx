@@ -10,7 +10,7 @@ export function SettersMetricsGrid({ metrics, trends = {} }: SettersMetricsGridP
     const mainCards = [
         {
             key: 'ai_message_sent',
-            title: 'Conversaciones Únicas',
+            title: 'Contactos del Día',
             icon: 'chat',
             value: metrics.ai_message_sent || 0,
             trend: trends.ai_message_sent,

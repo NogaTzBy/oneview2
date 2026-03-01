@@ -33,7 +33,7 @@ export function SettersDashboard({ isSuperAdmin }: SettersDashboardProps) {
 
         const csvRows = [
             ['Métrica', 'Valor', 'Fecha de Exportación'],
-            ['Conversaciones Únicas (Hoy)', metrics.ai_message_sent?.toString() || '0', new Date().toLocaleDateString()],
+            ['Contactos del Día', metrics.ai_message_sent?.toString() || '0', new Date().toLocaleDateString()],
             ['Nuevo Lead', metrics.conversations_started?.toString() || '0', new Date().toLocaleDateString()],
             ['Conversaciones Cerradas', metrics.conversations_closed?.toString() || '0', new Date().toLocaleDateString()],
             ['Primeros Seguimientos', metrics.first_follow_up?.toString() || '0', new Date().toLocaleDateString()],
@@ -191,9 +191,9 @@ export function SettersDashboard({ isSuperAdmin }: SettersDashboardProps) {
                         {trendData.length > 0 && (
                             <TrendChart
                                 data={trendData}
-                                title="Gráfico de Mensajes Enviados"
-                                subtitle={`Mensajes enviados — ${dateRange.label}`}
-                                totalLabel="Mensajes Totales"
+                                title="Historial de Personas Contactadas"
+                                subtitle={`Personas únicas con las que conversó la IA — ${dateRange.label}`}
+                                totalLabel="Personas Totales"
                                 isCurrency={false}
                             />
                         )}
