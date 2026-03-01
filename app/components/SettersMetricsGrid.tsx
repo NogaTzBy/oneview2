@@ -103,6 +103,14 @@ export function SettersMetricsGrid({ metrics, trends = {} }: SettersMetricsGridP
             trend: trends.state_scheduled_video_sent_remodel_over_150,
             highlighted: false
         },
+        {
+            key: 'avg_link_to_schedule_hours',
+            title: 'Tiempo Link → Agendado (prom.)',
+            icon: 'avg_time',
+            value: metrics.avg_link_to_schedule_hours != null ? `${metrics.avg_link_to_schedule_hours}hs` : '—',
+            trend: undefined,
+            highlighted: false
+        },
     ];
 
     return (

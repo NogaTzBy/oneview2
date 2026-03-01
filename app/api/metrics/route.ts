@@ -84,6 +84,7 @@ export async function GET(request: NextRequest) {
             state_scheduled_video_sent_under_150: 0,
             state_scheduled_video_sent_remodel_over_150: 0,
             instagram_follower: 0,
+            avg_link_to_schedule_hours: null as number | null,
         };
 
         const conversationSet = new Set<string>();
@@ -173,6 +174,34 @@ export async function GET(request: NextRequest) {
             metrics.closure_rate = Math.round(
                 (metrics.ai_purchases_count / metrics.conversations_started) * 100
             );
+        }
+
+        // Calculate average time from link sent to scheduled (in hours)
+        const SCHEDULED_TYPES = ['state_scheduled_video_sent', 'state_scheduled_video_sent_under_150', 'state_scheduled_video_sent_remodel_over_150'];
+        const convByid: Record<string, typeof events> = {};
+        events.forEach(e => {
+            if (!convByid[e.conversation_id]) convByid[e.conversation_id] = [];
+            convByid[e.conversation_id].push(e);
+        });
+
+        const linkToScheduleDiffs: number[] = [];
+        Object.values(convByid).forEach(convEvents => {
+            const sorted = [...convEvents].sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+            const linkSent = sorted.find(e => e.event_type === 'state_link_sent');
+            if (!linkSent) return;
+            const scheduled = sorted.find(e =>
+                SCHEDULED_TYPES.includes(e.event_type) &&
+                new Date(e.created_at) > new Date(linkSent.created_at)
+            );
+            if (scheduled) {
+                const diffHours = (new Date(scheduled.created_at).getTime() - new Date(linkSent.created_at).getTime()) / (1000 * 60 * 60);
+                linkToScheduleDiffs.push(diffHours);
+            }
+        });
+
+        if (linkToScheduleDiffs.length > 0) {
+            const avg = linkToScheduleDiffs.reduce((a, b) => a + b, 0) / linkToScheduleDiffs.length;
+            metrics.avg_link_to_schedule_hours = Math.round(avg * 10) / 10;
         }
 
         // Calculate previous day metrics for comparison

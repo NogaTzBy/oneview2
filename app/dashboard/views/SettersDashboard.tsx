@@ -39,6 +39,7 @@ export function SettersDashboard({ isSuperAdmin }: SettersDashboardProps) {
             ['Primeros Seguimientos', metrics.first_follow_up?.toString() || '0', new Date().toLocaleDateString()],
             ['Segundos Seguimientos', metrics.second_follow_up?.toString() || '0', new Date().toLocaleDateString()],
             ['Nuevos Seguidores', metrics.instagram_follower?.toString() || '0', new Date().toLocaleDateString()],
+            ['Tiempo Link→Agenda prom. (hs)', metrics.avg_link_to_schedule_hours?.toString() || '—', new Date().toLocaleDateString()],
             ['Estado: Obra desde cero', metrics.state_new_construction?.toString() || '0', new Date().toLocaleDateString()],
             ['Estado: Obra + planos > 150m²', metrics.state_construction_over_150?.toString() || '0', new Date().toLocaleDateString()],
             ['Estado: Link de agenda enviado', metrics.state_link_sent?.toString() || '0', new Date().toLocaleDateString()],
