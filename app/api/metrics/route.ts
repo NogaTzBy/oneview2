@@ -31,12 +31,14 @@ export async function GET(request: NextRequest) {
             .eq('project_id', projectId);
 
         if (from) {
-            query = query.gte('created_at', from);
+            // Adjust start boundary to UTC-3 (Argentina Time)
+            const fromDate = new Date(`${from}T03:00:00.000Z`);
+            query = query.gte('created_at', fromDate.toISOString());
         }
 
         if (to) {
-            // Add one day to include the entire 'to' date
-            const toDate = new Date(to);
+            // Add one day to include the entire 'to' date, adjusting boundary to UTC-3
+            const toDate = new Date(`${to}T03:00:00.000Z`);
             toDate.setDate(toDate.getDate() + 1);
             query = query.lt('created_at', toDate.toISOString());
         }
@@ -171,16 +173,17 @@ export async function GET(request: NextRequest) {
         const trends: Record<string, number> = {};
 
         if (from && to) {
-            const yesterday = new Date(to);
-            yesterday.setDate(yesterday.getDate() - 1);
-            const yesterdayStr = yesterday.toISOString().split('T')[0];
+            // Calculate yesterday considering UTC-3 offset
+            const yesterdayToDate = new Date(`${to}T03:00:00.000Z`);
+            const yesterdayFromDate = new Date(`${to}T03:00:00.000Z`);
+            yesterdayFromDate.setDate(yesterdayFromDate.getDate() - 1);
 
             const { data: yesterdayEvents } = await supabase
                 .from('ai_events')
                 .select('event_type, conversation_id')
                 .eq('project_id', projectId)
-                .gte('created_at', yesterdayStr)
-                .lt('created_at', to);
+                .gte('created_at', yesterdayFromDate.toISOString())
+                .lt('created_at', yesterdayToDate.toISOString());
 
             if (yesterdayEvents && yesterdayEvents.length > 0) {
                 const yesterdayMetrics = {
@@ -321,6 +324,12 @@ export async function GET(request: NextRequest) {
             trend,
             total_events: events.length,
             date_range: { from, to },
+        }, {
+            headers: {
+                'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+                'Pragma': 'no-cache',
+                'Expires': '0',
+            }
         });
     } catch (error) {
         console.error('Unexpected error:', error);
@@ -354,7 +363,10 @@ function generateTrendData(
 
     // Sum revenue by date for ai_purchase events, count for others
     events.forEach((event) => {
-        const eventDate = event.created_at.split('T')[0];
+        // Convert UTC created_at to local Argentina timezone (UTC-3)
+        const localTime = new Date(new Date(event.created_at).getTime() - 3 * 60 * 60 * 1000);
+        const eventDate = localTime.toISOString().split('T')[0];
+
         if (dateCounts[eventDate] !== undefined && event.event_type === metricKey) {
             // Para ai_purchase, sumar el monto; para otros eventos, contar
             if (metricKey === 'ai_purchase') {

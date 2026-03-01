@@ -76,6 +76,37 @@ export async function POST(request: NextRequest) {
             );
         }
 
+        // Check for duplicate events within the last minute to prevent double counting
+        if (conversation_id) {
+            // Get the most recent event of this type for this conversation
+            const { data: recentEvents, error: recentError } = await supabase
+                .from('ai_events')
+                .select('id, created_at')
+                .eq('project_id', project.id)
+                .eq('event_type', event_type)
+                .eq('conversation_id', conversation_id)
+                .order('created_at', { ascending: false })
+                .limit(1);
+
+            if (!recentError && recentEvents && recentEvents.length > 0) {
+                const latestEventTime = new Date(recentEvents[0].created_at).getTime();
+                const now = Date.now();
+                // We use Math.abs to protect against future timestamps generated incorrectly in the source
+                const diffSeconds = Math.abs(now - latestEventTime) / 1000;
+
+                // If the last inserted event was less than 60 seconds ago in real time
+                if (diffSeconds < 60) {
+                    console.log(`[Rate Limit] Ignored duplicate event: ${event_type} for conversation ${conversation_id}. Time diff was ${diffSeconds}s.`);
+                    // Return success so n8n thinks it worked and doesn't retry
+                    return NextResponse.json({
+                        success: true,
+                        message: 'Event ignored (duplicate within last minute)',
+                        event_id: recentEvents[0].id,
+                    });
+                }
+            }
+        }
+
         // Insert event
         const { data: event, error: eventError } = await supabase
             .from('ai_events')

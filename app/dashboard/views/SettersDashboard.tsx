@@ -81,9 +81,10 @@ export function SettersDashboard({ isSuperAdmin }: SettersDashboardProps) {
 
         setLoading(true);
         try {
-            // Pasamos metric_key=ai_message_sent para que el gráfico de tendencia muestre los mensajes
+            // Pasamos metric_key=ai_message_sent para que el gráfico de tendencia muestre los mensajes y agregamos _t para evitar agressive caching
             const response = await fetch(
-                `/api/metrics?projectId=${faProject.id}&start=${dateRange.from}&end=${dateRange.to}&trend=true&metric_key=ai_message_sent`
+                `/api/metrics?projectId=${faProject.id}&start=${dateRange.from}&end=${dateRange.to}&trend=true&metric_key=ai_message_sent&_t=${Date.now()}`,
+                { cache: 'no-store' }
             );
 
             if (response.ok) {
