@@ -31,15 +31,8 @@ export function SettersMetricsGrid({ metrics, trends = {} }: SettersMetricsGridP
             trend: trends.conversations_closed,
         },
         {
-            key: 'first_follow_up',
-            title: 'Primeros Seguimientos',
-            icon: 'looks_one',
-            value: metrics.first_follow_up || 0,
-            trend: trends.first_follow_up,
-        },
-        {
             key: 'second_follow_up',
-            title: 'Segundos Seguimientos',
+            title: 'Seguimientos',
             icon: 'looks_two',
             value: metrics.second_follow_up || 0,
             trend: trends.second_follow_up,
@@ -122,7 +115,7 @@ export function SettersMetricsGrid({ metrics, trends = {} }: SettersMetricsGridP
                     <span className="material-symbols-outlined text-purple-600">monitoring</span>
                     Métricas Generales
                 </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                     {mainCards.map((card) => (
                         <MetricCard
                             key={card.key}
