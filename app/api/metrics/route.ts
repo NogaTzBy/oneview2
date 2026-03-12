@@ -177,26 +177,28 @@ export async function GET(request: NextRequest) {
         }
 
         // Calculate average time from link sent to scheduled (in hours)
+        // Global matching: for each scheduled event, find the most recent preceding state_link_sent
+        // (regardless of conversation_id, since setters may use different IDs per event type)
         const SCHEDULED_TYPES = ['state_scheduled_video_sent', 'state_scheduled_video_sent_under_150', 'state_scheduled_video_sent_remodel_over_150'];
-        const convByid: Record<string, typeof events> = {};
-        events.forEach(e => {
-            if (!convByid[e.conversation_id]) convByid[e.conversation_id] = [];
-            convByid[e.conversation_id].push(e);
-        });
+
+        const linkSentEvents = events
+            .filter(e => e.event_type === 'state_link_sent')
+            .map(e => new Date(e.created_at).getTime())
+            .sort((a, b) => a - b);
+
+        const scheduledEvents = events
+            .filter(e => SCHEDULED_TYPES.includes(e.event_type))
+            .map(e => new Date(e.created_at).getTime())
+            .sort((a, b) => a - b);
 
         const linkToScheduleDiffs: number[] = [];
-        Object.values(convByid).forEach(convEvents => {
-            const sorted = [...convEvents].sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
-            const linkSent = sorted.find(e => e.event_type === 'state_link_sent');
-            if (!linkSent) return;
-            const scheduled = sorted.find(e =>
-                SCHEDULED_TYPES.includes(e.event_type) &&
-                new Date(e.created_at) > new Date(linkSent.created_at)
-            );
-            if (scheduled) {
-                const diffHours = (new Date(scheduled.created_at).getTime() - new Date(linkSent.created_at).getTime()) / (1000 * 60 * 60);
-                linkToScheduleDiffs.push(diffHours);
-            }
+        scheduledEvents.forEach(scheduledTs => {
+            // Find the most recent link_sent before this scheduled event
+            const precedingLinks = linkSentEvents.filter(ts => ts < scheduledTs);
+            if (precedingLinks.length === 0) return;
+            const closestLinkTs = precedingLinks[precedingLinks.length - 1];
+            const diffHours = (scheduledTs - closestLinkTs) / (1000 * 60 * 60);
+            linkToScheduleDiffs.push(diffHours);
         });
 
         if (linkToScheduleDiffs.length > 0) {
