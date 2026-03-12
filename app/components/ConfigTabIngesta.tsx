@@ -46,15 +46,15 @@ export function ConfigTabIngesta({ project, onRefresh, dashboardContext = 'ecomm
     const [showToken, setShowToken] = useState(false);
     const [copied, setCopied] = useState(false);
     const [copiedGet, setCopiedGet] = useState(false);
-
-    const GET_ENDPOINT_BASE = 'https://oneview2.vercel.app/api/setters/contactos-unicos';
+    const [copiedGetSeg, setCopiedGetSeg] = useState(false);
 
     const today = new Date().toISOString().split('T')[0];
     const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+
+    // Contactos Únicos GET
+    const GET_ENDPOINT_BASE = 'https://oneview2.vercel.app/api/setters/contactos-unicos';
     const getExampleUrl = `${GET_ENDPOINT_BASE}?start=${thirtyDaysAgo}&end=${today}&trend=true`;
-
     const getExampleCurl = `curl -X GET "${getExampleUrl}"`;
-
     const getExampleResponse = `{
   "project": { "id": "${project.id}", "name": "FA Interiores" },
   "metric": "contactos_unicos",
@@ -67,10 +67,32 @@ export function ConfigTabIngesta({ project, onRefresh, dashboardContext = 'ecomm
   ]
 }`;
 
+    // Seguimientos GET
+    const GET_SEG_ENDPOINT_BASE = 'https://oneview2.vercel.app/api/setters/seguimientos';
+    const getSegExampleUrl = `${GET_SEG_ENDPOINT_BASE}?start=${thirtyDaysAgo}&end=${today}&trend=true`;
+    const getSegExampleCurl = `curl -X GET "${getSegExampleUrl}"`;
+    const getSegExampleResponse = `{
+  "project": { "id": "${project.id}", "name": "FA Interiores" },
+  "metric": "seguimientos",
+  "total": 18,
+  "date_range": { "from": "${thirtyDaysAgo}", "to": "${today}" },
+  "trend": [
+    { "date": "lun. 10 feb.", "value": 1 },
+    { "date": "mar. 11 feb.", "value": 2 },
+    ...
+  ]
+}`;
+
     const handleCopyGet = (text: string) => {
         navigator.clipboard.writeText(text);
         setCopiedGet(true);
         setTimeout(() => setCopiedGet(false), 2000);
+    };
+
+    const handleCopyGetSeg = (text: string) => {
+        navigator.clipboard.writeText(text);
+        setCopiedGetSeg(true);
+        setTimeout(() => setCopiedGetSeg(false), 2000);
     };
 
     const handleCopy = (text: string) => {
@@ -412,6 +434,74 @@ export function ConfigTabIngesta({ project, onRefresh, dashboardContext = 'ecomm
                             <div className="bg-green-50 border border-green-200 rounded-lg p-4 overflow-x-auto">
                                 <pre className="text-xs text-green-800 font-mono leading-relaxed">
                                     {getExampleResponse}
+                                </pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* GET Endpoint — Seguimientos (setters only) */}
+            {dashboardContext === 'setters' && (
+                <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div className="p-6 border-b border-slate-200">
+                        <div className="flex items-center gap-2 mb-1">
+                            <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs font-bold rounded uppercase tracking-wide">GET</span>
+                            <h4 className="text-base font-semibold text-slate-900">Seguimientos</h4>
+                        </div>
+                        <p className="text-sm text-slate-500">Consultá el total de seguimientos del período. No requiere token.</p>
+                    </div>
+
+                    <div className="p-6 bg-slate-50 border-b border-slate-200">
+                        <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-slate-200">
+                            <span className="material-symbols-outlined text-slate-400">link</span>
+                            <code className="text-xs font-mono text-slate-700 flex-1 break-all">
+                                {GET_SEG_ENDPOINT_BASE}
+                            </code>
+                            <button
+                                onClick={() => handleCopyGetSeg(GET_SEG_ENDPOINT_BASE)}
+                                className="px-3 py-1.5 text-sm font-medium text-primary hover:bg-primary/5 rounded-lg transition-colors flex items-center gap-1.5 shrink-0"
+                            >
+                                <span className="material-symbols-outlined text-[18px]">content_copy</span>
+                            </button>
+                        </div>
+                        <p className="mt-2 text-xs text-slate-400">
+                            Params opcionales: <code className="bg-slate-100 px-1 rounded">start</code>, <code className="bg-slate-100 px-1 rounded">end</code> (YYYY-MM-DD), <code className="bg-slate-100 px-1 rounded">trend=true</code>
+                        </p>
+                    </div>
+
+                    <div className="divide-y divide-slate-200">
+                        <div className="p-6 bg-slate-50">
+                            <div className="flex justify-between items-center mb-3">
+                                <div className="flex items-center gap-2">
+                                    <span className="material-symbols-outlined text-slate-400 text-[18px]">terminal</span>
+                                    <span className="text-xs font-semibold text-slate-700 uppercase tracking-wide">Request</span>
+                                </div>
+                                <button
+                                    onClick={() => handleCopyGetSeg(getSegExampleCurl)}
+                                    className="text-slate-500 hover:text-primary transition-colors flex items-center gap-1 text-xs font-medium"
+                                >
+                                    <span className="material-symbols-outlined text-[16px]">
+                                        {copiedGetSeg ? 'check' : 'content_copy'}
+                                    </span>
+                                    {copiedGetSeg ? 'Copiado' : 'Copiar'}
+                                </button>
+                            </div>
+                            <div className="bg-white border border-slate-200 rounded-lg p-4 overflow-x-auto">
+                                <pre className="text-xs text-slate-700 font-mono leading-relaxed whitespace-pre">
+                                    {getSegExampleCurl}
+                                </pre>
+                            </div>
+                        </div>
+
+                        <div className="p-6 bg-white">
+                            <div className="flex items-center gap-2 mb-3">
+                                <span className="material-symbols-outlined text-green-500 text-[18px]">check_circle</span>
+                                <span className="text-xs font-semibold text-slate-700 uppercase tracking-wide">Respuesta Exitosa</span>
+                            </div>
+                            <div className="bg-green-50 border border-green-200 rounded-lg p-4 overflow-x-auto">
+                                <pre className="text-xs text-green-800 font-mono leading-relaxed">
+                                    {getSegExampleResponse}
                                 </pre>
                             </div>
                         </div>
