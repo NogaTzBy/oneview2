@@ -45,9 +45,32 @@ export async function GET(request: NextRequest) {
             query = query.lt('created_at', toDate.toISOString());
         }
 
-        const { data: events, error } = await query.order('created_at', { ascending: false });
+        // Helper to fetch all paginated events
+        async function fetchAllEvents(baseQuery: any) {
+            let allData: any[] = [];
+            let page = 0;
+            const size = 1000;
+            let hasMore = true;
 
-        if (error) {
+            while (hasMore) {
+                const { data, error } = await baseQuery.range(page * size, (page + 1) * size - 1);
+                if (error) throw error;
+
+                if (data && data.length > 0) {
+                    allData = [...allData, ...data];
+                    hasMore = data.length === size;
+                    page++;
+                } else {
+                    hasMore = false;
+                }
+            }
+            return allData;
+        }
+
+        let events;
+        try {
+            events = await fetchAllEvents(query.order('created_at', { ascending: false }));
+        } catch (error) {
             console.error('Error fetching events:', error);
             return NextResponse.json(
                 { error: 'Failed to fetch events' },
@@ -215,12 +238,20 @@ export async function GET(request: NextRequest) {
             const yesterdayFromDate = new Date(`${to}T03:00:00.000Z`);
             yesterdayFromDate.setDate(yesterdayFromDate.getDate() - 1);
 
-            const { data: yesterdayEvents } = await supabase
+            const yesterdayQuery = supabase
                 .from('ai_events')
                 .select('event_type, conversation_id')
                 .eq('project_id', projectId)
                 .gte('created_at', yesterdayFromDate.toISOString())
                 .lt('created_at', yesterdayToDate.toISOString());
+
+            let yesterdayEvents;
+            try {
+                yesterdayEvents = await fetchAllEvents(yesterdayQuery);
+            } catch (error) {
+                console.error('Error fetching yesterday events:', error);
+                yesterdayEvents = [];
+            }
 
             if (yesterdayEvents && yesterdayEvents.length > 0) {
                 const yesterdayMetrics = {
