@@ -77,7 +77,20 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Check for duplicate events within the last minute to prevent double counting
+        // Setters state events that use a 10-minute dedup window per conversation
+        const SETTERS_STATE_EVENTS = [
+            'first_follow_up',
+            'second_follow_up',
+            'state_new_construction',
+            'state_construction_over_150',
+            'state_link_sent',
+            'state_scheduled_video_sent',
+            'state_scheduled_video_sent_under_150',
+            'state_scheduled_video_sent_remodel_over_150',
+            'instagram_follower',
+        ];
+
+        // Check for duplicate events to prevent double counting
         if (conversation_id) {
             // Get the most recent event of this type for this conversation
             const { data: recentEvents, error: recentError } = await supabase
@@ -93,9 +106,8 @@ export async function POST(request: NextRequest) {
                 const latestEventDate = new Date(recentEvents[0].created_at);
                 const now = new Date();
 
-                // Para ai_message_sent, limitamos a 1 vez por día por conversación
+                // Para ai_message_sent: 1 vez por día por conversación (UTC-3)
                 if (event_type === 'ai_message_sent') {
-                    // Convertir ambas fechas a zona horaria local (UTC-3)
                     const latestLocal = new Date(latestEventDate.getTime() - 3 * 60 * 60 * 1000);
                     const nowLocal = new Date(now.getTime() - 3 * 60 * 60 * 1000);
 
@@ -108,8 +120,19 @@ export async function POST(request: NextRequest) {
                             event_id: recentEvents[0].id,
                         });
                     }
+                } else if (SETTERS_STATE_EVENTS.includes(event_type)) {
+                    // Para eventos de estado de Setters: 10 minutos por conversación
+                    const diffSeconds = Math.abs(now.getTime() - latestEventDate.getTime()) / 1000;
+                    if (diffSeconds < 600) {
+                        console.log(`[Rate Limit] Ignored duplicate setters event: ${event_type} for conversation ${conversation_id}. Time diff was ${diffSeconds}s.`);
+                        return NextResponse.json({
+                            success: true,
+                            message: 'Event ignored (duplicate within last 10 minutes)',
+                            event_id: recentEvents[0].id,
+                        });
+                    }
                 } else {
-                    // Para el resto de los eventos, el límite es 1 minuto (60 segundos)
+                    // Para el resto de los eventos: 1 minuto
                     const diffSeconds = Math.abs(now.getTime() - latestEventDate.getTime()) / 1000;
                     if (diffSeconds < 60) {
                         console.log(`[Rate Limit] Ignored duplicate event: ${event_type} for conversation ${conversation_id}. Time diff was ${diffSeconds}s.`);
