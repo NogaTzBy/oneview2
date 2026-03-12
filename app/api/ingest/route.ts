@@ -121,13 +121,14 @@ export async function POST(request: NextRequest) {
                         });
                     }
                 } else if (SETTERS_STATE_EVENTS.includes(event_type)) {
-                    // Para eventos de estado de Setters: 10 minutos por conversación
+                    // Para eventos de estado de Setters: 24 horas por conversación y tipo
+                    // (mismo tipo en misma conv no se repite en el día; distintos tipos sí se aceptan)
                     const diffSeconds = Math.abs(now.getTime() - latestEventDate.getTime()) / 1000;
-                    if (diffSeconds < 600) {
+                    if (diffSeconds < 86400) {
                         console.log(`[Rate Limit] Ignored duplicate setters event: ${event_type} for conversation ${conversation_id}. Time diff was ${diffSeconds}s.`);
                         return NextResponse.json({
                             success: true,
-                            message: 'Event ignored (duplicate within last 10 minutes)',
+                            message: 'Event ignored (same event type already registered in last 24h for this conversation)',
                             event_id: recentEvents[0].id,
                         });
                     }
