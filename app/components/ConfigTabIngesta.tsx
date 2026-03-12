@@ -45,36 +45,57 @@ export function ConfigTabIngesta({ project, onRefresh, dashboardContext = 'ecomm
     const [selectedEvent, setSelectedEvent] = useState(EVENT_TYPES[0]);
     const [showToken, setShowToken] = useState(false);
     const [copied, setCopied] = useState(false);
+    const [getExpanded, setGetExpanded] = useState(false);
     const [copiedGet, setCopiedGet] = useState(false);
-    const [copiedGetSeg, setCopiedGetSeg] = useState(false);
 
     const today = new Date().toISOString().split('T')[0];
     const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
 
-    // Contactos Únicos GET
-    const GET_ENDPOINT_BASE = 'https://oneview2.vercel.app/api/setters/contactos-unicos';
-    const getExampleUrl = `${GET_ENDPOINT_BASE}?start=${thirtyDaysAgo}&end=${today}&trend=true`;
-    const getExampleCurl = `curl -X GET "${getExampleUrl}"`;
+    const GET_ENDPOINTS = [
+        {
+            key: 'contactos-unicos',
+            label: 'Contactos Únicos',
+            icon: 'chat',
+            description: 'Total de contactos únicos del período.',
+            url: 'https://oneview2.vercel.app/api/setters/contactos-unicos',
+            metricKey: 'contactos_unicos',
+            totalExample: 42,
+        },
+        {
+            key: 'seguimientos',
+            label: 'Seguimientos',
+            icon: 'looks_two',
+            description: 'Total de seguimientos del período.',
+            url: 'https://oneview2.vercel.app/api/setters/seguimientos',
+            metricKey: 'seguimientos',
+            totalExample: 18,
+        },
+        {
+            key: 'link-agenda',
+            label: 'Link de Agenda Enviado',
+            icon: 'link',
+            description: 'Total de links de agenda enviados del período.',
+            url: 'https://oneview2.vercel.app/api/setters/link-agenda',
+            metricKey: 'link_agenda_enviado',
+            totalExample: 5,
+        },
+        {
+            key: 'agendamientos',
+            label: 'Agendamientos',
+            icon: 'event_available',
+            description: 'Total agrupado de los tres tipos de agendamiento del período.',
+            url: 'https://oneview2.vercel.app/api/setters/agendamientos',
+            metricKey: 'agendamientos',
+            totalExample: 3,
+        },
+    ];
+    const [selectedGetEndpoint, setSelectedGetEndpoint] = useState(GET_ENDPOINTS[0]);
+
+    const getExampleCurl = `curl -X GET "${selectedGetEndpoint.url}?start=${thirtyDaysAgo}&end=${today}&trend=true"`;
     const getExampleResponse = `{
   "project": { "id": "${project.id}", "name": "FA Interiores" },
-  "metric": "contactos_unicos",
-  "total": 42,
-  "date_range": { "from": "${thirtyDaysAgo}", "to": "${today}" },
-  "trend": [
-    { "date": "lun. 10 feb.", "value": 3 },
-    { "date": "mar. 11 feb.", "value": 5 },
-    ...
-  ]
-}`;
-
-    // Seguimientos GET
-    const GET_SEG_ENDPOINT_BASE = 'https://oneview2.vercel.app/api/setters/seguimientos';
-    const getSegExampleUrl = `${GET_SEG_ENDPOINT_BASE}?start=${thirtyDaysAgo}&end=${today}&trend=true`;
-    const getSegExampleCurl = `curl -X GET "${getSegExampleUrl}"`;
-    const getSegExampleResponse = `{
-  "project": { "id": "${project.id}", "name": "FA Interiores" },
-  "metric": "seguimientos",
-  "total": 18,
+  "metric": "${selectedGetEndpoint.metricKey}",
+  "total": ${selectedGetEndpoint.totalExample},
   "date_range": { "from": "${thirtyDaysAgo}", "to": "${today}" },
   "trend": [
     { "date": "lun. 10 feb.", "value": 1 },
@@ -87,12 +108,6 @@ export function ConfigTabIngesta({ project, onRefresh, dashboardContext = 'ecomm
         navigator.clipboard.writeText(text);
         setCopiedGet(true);
         setTimeout(() => setCopiedGet(false), 2000);
-    };
-
-    const handleCopyGetSeg = (text: string) => {
-        navigator.clipboard.writeText(text);
-        setCopiedGetSeg(true);
-        setTimeout(() => setCopiedGetSeg(false), 2000);
     };
 
     const handleCopy = (text: string) => {
@@ -373,139 +388,104 @@ export function ConfigTabIngesta({ project, onRefresh, dashboardContext = 'ecomm
                 </div>
             </div>
 
-            {/* GET Endpoint — Contactos Únicos (setters only) */}
+            {/* GET Endpoints — desplegable (setters only) */}
             {dashboardContext === 'setters' && (
                 <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-                    <div className="p-6 border-b border-slate-200">
-                        <div className="flex items-center gap-2 mb-1">
-                            <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs font-bold rounded uppercase tracking-wide">GET</span>
-                            <h4 className="text-base font-semibold text-slate-900">Contactos Únicos</h4>
+                    <button
+                        onClick={() => setGetExpanded(!getExpanded)}
+                        className="w-full p-6 flex items-center justify-between hover:bg-slate-50 transition-colors"
+                    >
+                        <div>
+                            <div className="flex items-center gap-2 mb-1">
+                                <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs font-bold rounded uppercase tracking-wide">GET</span>
+                                <h4 className="text-base font-semibold text-slate-900">Endpoints de Consulta</h4>
+                            </div>
+                            <p className="text-sm text-slate-500 text-left">Consultá métricas del proyecto. No requieren token.</p>
                         </div>
-                        <p className="text-sm text-slate-500">Consultá el total de contactos únicos del período. No requiere token.</p>
-                    </div>
+                        <span className={`material-symbols-outlined text-slate-400 transition-transform ${getExpanded ? 'rotate-180' : ''}`}>
+                            expand_more
+                        </span>
+                    </button>
 
-                    <div className="p-6 bg-slate-50 border-b border-slate-200">
-                        <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-slate-200">
-                            <span className="material-symbols-outlined text-slate-400">link</span>
-                            <code className="text-xs font-mono text-slate-700 flex-1 break-all">
-                                {GET_ENDPOINT_BASE}
-                            </code>
-                            <button
-                                onClick={() => handleCopyGet(GET_ENDPOINT_BASE)}
-                                className="px-3 py-1.5 text-sm font-medium text-primary hover:bg-primary/5 rounded-lg transition-colors flex items-center gap-1.5 shrink-0"
-                            >
-                                <span className="material-symbols-outlined text-[18px]">content_copy</span>
-                            </button>
-                        </div>
-                        <p className="mt-2 text-xs text-slate-400">
-                            Params opcionales: <code className="bg-slate-100 px-1 rounded">start</code>, <code className="bg-slate-100 px-1 rounded">end</code> (YYYY-MM-DD), <code className="bg-slate-100 px-1 rounded">trend=true</code>
-                        </p>
-                    </div>
-
-                    <div className="divide-y divide-slate-200">
-                        <div className="p-6 bg-slate-50">
-                            <div className="flex justify-between items-center mb-3">
-                                <div className="flex items-center gap-2">
-                                    <span className="material-symbols-outlined text-slate-400 text-[18px]">terminal</span>
-                                    <span className="text-xs font-semibold text-slate-700 uppercase tracking-wide">Request</span>
+                    {getExpanded && (
+                        <div className="border-t border-slate-200">
+                            <div className="grid grid-cols-1 lg:grid-cols-3 divide-y lg:divide-y-0 lg:divide-x divide-slate-200">
+                                {/* Endpoint selector */}
+                                <div className="p-6 bg-slate-50/50">
+                                    <label className="block text-sm font-medium text-slate-700 mb-3">Endpoint</label>
+                                    <div className="space-y-2">
+                                        {GET_ENDPOINTS.map((ep) => (
+                                            <button
+                                                key={ep.key}
+                                                onClick={() => setSelectedGetEndpoint(ep)}
+                                                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${selectedGetEndpoint.key === ep.key
+                                                    ? 'bg-primary text-white'
+                                                    : 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-200'
+                                                    }`}
+                                            >
+                                                <span className="material-symbols-outlined text-[18px]">{ep.icon}</span>
+                                                {ep.label}
+                                            </button>
+                                        ))}
+                                    </div>
                                 </div>
-                                <button
-                                    onClick={() => handleCopyGet(getExampleCurl)}
-                                    className="text-slate-500 hover:text-primary transition-colors flex items-center gap-1 text-xs font-medium"
-                                >
-                                    <span className="material-symbols-outlined text-[16px]">
-                                        {copiedGet ? 'check' : 'content_copy'}
-                                    </span>
-                                    {copiedGet ? 'Copiado' : 'Copiar'}
-                                </button>
-                            </div>
-                            <div className="bg-white border border-slate-200 rounded-lg p-4 overflow-x-auto">
-                                <pre className="text-xs text-slate-700 font-mono leading-relaxed whitespace-pre">
-                                    {getExampleCurl}
-                                </pre>
-                            </div>
-                        </div>
 
-                        <div className="p-6 bg-white">
-                            <div className="flex items-center gap-2 mb-3">
-                                <span className="material-symbols-outlined text-green-500 text-[18px]">check_circle</span>
-                                <span className="text-xs font-semibold text-slate-700 uppercase tracking-wide">Respuesta Exitosa</span>
-                            </div>
-                            <div className="bg-green-50 border border-green-200 rounded-lg p-4 overflow-x-auto">
-                                <pre className="text-xs text-green-800 font-mono leading-relaxed">
-                                    {getExampleResponse}
-                                </pre>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
+                                {/* cURL & Response */}
+                                <div className="col-span-1 lg:col-span-2 divide-y divide-slate-200">
+                                    {/* URL */}
+                                    <div className="p-6 bg-slate-50">
+                                        <p className="text-xs text-slate-500 mb-2">{selectedGetEndpoint.description}</p>
+                                        <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-slate-200">
+                                            <span className="material-symbols-outlined text-slate-400 text-[18px]">link</span>
+                                            <code className="text-xs font-mono text-slate-700 flex-1 break-all">{selectedGetEndpoint.url}</code>
+                                            <button
+                                                onClick={() => handleCopyGet(selectedGetEndpoint.url)}
+                                                className="px-2 py-1.5 text-sm font-medium text-primary hover:bg-primary/5 rounded-lg transition-colors flex items-center gap-1 shrink-0"
+                                            >
+                                                <span className="material-symbols-outlined text-[16px]">content_copy</span>
+                                            </button>
+                                        </div>
+                                        <p className="mt-2 text-xs text-slate-400">
+                                            Params opcionales: <code className="bg-slate-100 px-1 rounded">start</code>, <code className="bg-slate-100 px-1 rounded">end</code> (YYYY-MM-DD), <code className="bg-slate-100 px-1 rounded">trend=true</code>
+                                        </p>
+                                    </div>
 
-            {/* GET Endpoint — Seguimientos (setters only) */}
-            {dashboardContext === 'setters' && (
-                <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-                    <div className="p-6 border-b border-slate-200">
-                        <div className="flex items-center gap-2 mb-1">
-                            <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs font-bold rounded uppercase tracking-wide">GET</span>
-                            <h4 className="text-base font-semibold text-slate-900">Seguimientos</h4>
-                        </div>
-                        <p className="text-sm text-slate-500">Consultá el total de seguimientos del período. No requiere token.</p>
-                    </div>
+                                    {/* Request */}
+                                    <div className="p-6 bg-slate-50">
+                                        <div className="flex justify-between items-center mb-3">
+                                            <div className="flex items-center gap-2">
+                                                <span className="material-symbols-outlined text-slate-400 text-[18px]">terminal</span>
+                                                <span className="text-xs font-semibold text-slate-700 uppercase tracking-wide">Request</span>
+                                            </div>
+                                            <button
+                                                onClick={() => handleCopyGet(getExampleCurl)}
+                                                className="text-slate-500 hover:text-primary transition-colors flex items-center gap-1 text-xs font-medium"
+                                            >
+                                                <span className="material-symbols-outlined text-[16px]">
+                                                    {copiedGet ? 'check' : 'content_copy'}
+                                                </span>
+                                                {copiedGet ? 'Copiado' : 'Copiar'}
+                                            </button>
+                                        </div>
+                                        <div className="bg-white border border-slate-200 rounded-lg p-4 overflow-x-auto">
+                                            <pre className="text-xs text-slate-700 font-mono leading-relaxed whitespace-pre">{getExampleCurl}</pre>
+                                        </div>
+                                    </div>
 
-                    <div className="p-6 bg-slate-50 border-b border-slate-200">
-                        <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-slate-200">
-                            <span className="material-symbols-outlined text-slate-400">link</span>
-                            <code className="text-xs font-mono text-slate-700 flex-1 break-all">
-                                {GET_SEG_ENDPOINT_BASE}
-                            </code>
-                            <button
-                                onClick={() => handleCopyGetSeg(GET_SEG_ENDPOINT_BASE)}
-                                className="px-3 py-1.5 text-sm font-medium text-primary hover:bg-primary/5 rounded-lg transition-colors flex items-center gap-1.5 shrink-0"
-                            >
-                                <span className="material-symbols-outlined text-[18px]">content_copy</span>
-                            </button>
-                        </div>
-                        <p className="mt-2 text-xs text-slate-400">
-                            Params opcionales: <code className="bg-slate-100 px-1 rounded">start</code>, <code className="bg-slate-100 px-1 rounded">end</code> (YYYY-MM-DD), <code className="bg-slate-100 px-1 rounded">trend=true</code>
-                        </p>
-                    </div>
-
-                    <div className="divide-y divide-slate-200">
-                        <div className="p-6 bg-slate-50">
-                            <div className="flex justify-between items-center mb-3">
-                                <div className="flex items-center gap-2">
-                                    <span className="material-symbols-outlined text-slate-400 text-[18px]">terminal</span>
-                                    <span className="text-xs font-semibold text-slate-700 uppercase tracking-wide">Request</span>
+                                    {/* Response */}
+                                    <div className="p-6 bg-white">
+                                        <div className="flex items-center gap-2 mb-3">
+                                            <span className="material-symbols-outlined text-green-500 text-[18px]">check_circle</span>
+                                            <span className="text-xs font-semibold text-slate-700 uppercase tracking-wide">Respuesta Exitosa</span>
+                                        </div>
+                                        <div className="bg-green-50 border border-green-200 rounded-lg p-4 overflow-x-auto">
+                                            <pre className="text-xs text-green-800 font-mono leading-relaxed">{getExampleResponse}</pre>
+                                        </div>
+                                    </div>
                                 </div>
-                                <button
-                                    onClick={() => handleCopyGetSeg(getSegExampleCurl)}
-                                    className="text-slate-500 hover:text-primary transition-colors flex items-center gap-1 text-xs font-medium"
-                                >
-                                    <span className="material-symbols-outlined text-[16px]">
-                                        {copiedGetSeg ? 'check' : 'content_copy'}
-                                    </span>
-                                    {copiedGetSeg ? 'Copiado' : 'Copiar'}
-                                </button>
-                            </div>
-                            <div className="bg-white border border-slate-200 rounded-lg p-4 overflow-x-auto">
-                                <pre className="text-xs text-slate-700 font-mono leading-relaxed whitespace-pre">
-                                    {getSegExampleCurl}
-                                </pre>
                             </div>
                         </div>
-
-                        <div className="p-6 bg-white">
-                            <div className="flex items-center gap-2 mb-3">
-                                <span className="material-symbols-outlined text-green-500 text-[18px]">check_circle</span>
-                                <span className="text-xs font-semibold text-slate-700 uppercase tracking-wide">Respuesta Exitosa</span>
-                            </div>
-                            <div className="bg-green-50 border border-green-200 rounded-lg p-4 overflow-x-auto">
-                                <pre className="text-xs text-green-800 font-mono leading-relaxed">
-                                    {getSegExampleResponse}
-                                </pre>
-                            </div>
-                        </div>
-                    </div>
+                    )}
                 </div>
             )}
 
