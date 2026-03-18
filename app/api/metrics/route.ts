@@ -33,14 +33,15 @@ export async function GET(request: NextRequest) {
             .eq('project_id', projectId);
 
         if (from) {
-            // Adjust start boundary to UTC-3 (Argentina Time)
-            const fromDate = new Date(`${from}T03:00:00.000Z`);
+            // Adjust start boundary to UTC-3 (Argentina Time) with 2 AM day reset
+            // Day starts at 02:00 local (Argentina/Uruguay) = 05:00 UTC
+            const fromDate = new Date(`${from}T05:00:00.000Z`);
             query = query.gte('created_at', fromDate.toISOString());
         }
 
         if (to) {
-            // Add one day to include the entire 'to' date, adjusting boundary to UTC-3
-            const toDate = new Date(`${to}T03:00:00.000Z`);
+            // Add one day to include the entire 'to' date (up to 02:00 AM next day)
+            const toDate = new Date(`${to}T05:00:00.000Z`);
             toDate.setDate(toDate.getDate() + 1);
             query = query.lt('created_at', toDate.toISOString());
         }
@@ -233,9 +234,9 @@ export async function GET(request: NextRequest) {
         const trends: Record<string, number> = {};
 
         if (from && to) {
-            // Calculate yesterday considering UTC-3 offset
-            const yesterdayToDate = new Date(`${to}T03:00:00.000Z`);
-            const yesterdayFromDate = new Date(`${to}T03:00:00.000Z`);
+            // Calculate yesterday considering UTC-3 offset with 2 AM day reset
+            const yesterdayToDate = new Date(`${to}T05:00:00.000Z`);
+            const yesterdayFromDate = new Date(`${to}T05:00:00.000Z`);
             yesterdayFromDate.setDate(yesterdayFromDate.getDate() - 1);
 
             const yesterdayQuery = supabase
@@ -436,8 +437,9 @@ function generateTrendData(
 
     // Sum revenue by date for ai_purchase events, count for others
     events.forEach((event) => {
-        // Convert UTC created_at to local Argentina timezone (UTC-3)
-        const localTime = new Date(new Date(event.created_at).getTime() - 3 * 60 * 60 * 1000);
+        // Convert UTC created_at to "business day" timezone: UTC-3 shifted by 2h (day resets at 2 AM)
+        // Subtracting 5h means events from 00:00-02:00 local fall on the previous calendar date
+        const localTime = new Date(new Date(event.created_at).getTime() - 5 * 60 * 60 * 1000);
         const eventDate = localTime.toISOString().split('T')[0];
 
         if (dateCounts[eventDate] !== undefined && event.event_type === metricKey) {
